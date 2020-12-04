@@ -13,8 +13,28 @@
 
 const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFile} = require(`../../utils`);
 
+/**
+ * Число объявлений по умолчанию
+ * @const
+ * @type {number}
+ * @default
+ */
 const DEFAULT_COUNT = 1;
+
+/**
+ * Максимальное число генерируемых объявлений
+ * @const
+ * @type {number}
+ * @default
+ */
 const MAX_COUNT = 1000;
+
+/**
+ * Название файла для записи результата
+ * @const
+ * @type {string}
+ * @default
+ */
 const FILE_NAME = `mocks.json`;
 
 const SALE_TITLES = [
