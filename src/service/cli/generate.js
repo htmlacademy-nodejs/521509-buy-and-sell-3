@@ -7,9 +7,7 @@
   Моки сохраняются в указанный файл в корневой директории.
 */
 
-const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray} = require(`../../utils`);
-const {EXIT_CODES} = require(`../../consts`);
-const fs = require(`fs`);
+const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFile} = require(`../../utils`);
 
 /*
   Данные для генерации взяты из задания.
@@ -121,7 +119,7 @@ const generateOffers = (count) => {
 
 module.exports = {
   name: `--generate`,
-  run(args) {
+  async run(args) {
     const [count] = args;
     const countNumber = Number.parseInt(count, 10) || DEFAULT_COUNT;
     if (countNumber > MAX_COUNT) {
@@ -130,15 +128,9 @@ module.exports = {
       );
       return;
     }
-    const content = JSON.stringify(generateOffers(countNumber));
 
-    // записываем данные в файл
-    fs.writeFile(FILE_NAME, content, (err) => {
-      if (err) {
-        console.error(`Ошибка записи в файл...`);
-        return process.exit(EXIT_CODES.FAIL);
-      }
-      return console.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`);
-    });
+    await writeFile(FILE_NAME, generateOffers(countNumber));
+    console.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`);
+
   }
 };
