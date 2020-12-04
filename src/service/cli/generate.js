@@ -13,6 +13,7 @@
 
 const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFile} = require(`../../utils`);
 const {ExitCodes} = require(`../../consts`);
+const chalk = require(`chalk`);
 
 /**
  * Число объявлений по умолчанию
@@ -155,17 +156,17 @@ module.exports = {
     const [count] = args;
     const countNumber = Number.parseInt(count, 10) || DEFAULT_COUNT;
     if (countNumber > MAX_COUNT) {
-      console.info(
+      console.error(chalk.red(
           `Указано число объявлений больше ${MAX_COUNT}. \nУкажи не больше ${MAX_COUNT} объявлений`
-      );
+      ));
       return;
     }
 
     try {
       await writeFile(FILE_NAME, generateOffers(countNumber));
-      console.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`);
+      console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`));
     } catch (e) {
-      console.error(`Ошибка записи в файл ${FILE_NAME} ${e}`);
+      console.error(chalk.red(`Ошибка записи в файл ${FILE_NAME} ${e}`));
       process.exit(ExitCodes.FAIL);
     }
 
