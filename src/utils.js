@@ -6,8 +6,6 @@
  */
 
 const fs = require(`fs`).promises;
-const {ExitCodes} = require(`./consts`);
-
 
 /**
  * getRandomNumber генерирует случайное число в пределах переданных функции.
@@ -73,15 +71,7 @@ const getRandomItemsInArray = (array) => {
 
 const writeFile = async (filePath, data) => {
   const content = JSON.stringify(data);
-
-  try {
-    await fs.writeFile(filePath, content);
-  } catch (e) {
-    console.error(`Ошибка записи в файл ${filePath} ${e}`);
-    return process.exit(ExitCodes.FAIL);
-  }
-
-  return true; // eslint обязывает что-то вернуть в стрелочных функциях
+  return await fs.writeFile(filePath, content);
 };
 
 

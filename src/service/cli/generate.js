@@ -12,6 +12,7 @@
 */
 
 const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFile} = require(`../../utils`);
+const {ExitCodes} = require(`../../consts`);
 
 /**
  * Число объявлений по умолчанию
@@ -160,8 +161,13 @@ module.exports = {
       return;
     }
 
-    await writeFile(FILE_NAME, generateOffers(countNumber));
-    console.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`);
+    try {
+      await writeFile(FILE_NAME, generateOffers(countNumber));
+      console.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`);
+    } catch (e) {
+      console.error(`Ошибка записи в файл ${FILE_NAME} ${e}`);
+      process.exit(ExitCodes.FAIL);
+    }
 
   }
 };
