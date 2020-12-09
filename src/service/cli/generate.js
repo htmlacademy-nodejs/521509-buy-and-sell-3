@@ -11,6 +11,8 @@
  *  @module src/service/cli/generate
 */
 
+const path = require(`path`);
+
 const chalk = require(`chalk`);
 
 const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFileInJSON} = require(`../../utils`);
@@ -39,6 +41,14 @@ const MAX_COUNT = 1000;
  * @default
  */
 const FILE_NAME = `mocks.json`;
+
+/**
+ * Относительный путь к месту сохранения файла
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATCH_TO_FOLDER = `../../../`;
 
 const SALE_TITLES = [
   `Продам книги Стивена Кинга`,
@@ -164,8 +174,9 @@ module.exports = {
     }
 
     try {
-      await writeFileInJSON(FILE_NAME, generateOffers(countNumber));
-      console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`));
+      const absoluteFilePath = path.join(__dirname, PATCH_TO_FOLDER, FILE_NAME);
+      await writeFileInJSON(absoluteFilePath, generateOffers(countNumber));
+      console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.\nАбсолютный путь до файла: ${absoluteFilePath}`));
     } catch (e) {
       console.error(chalk.red(`Ошибка записи в файл ${FILE_NAME} ${e}`));
       process.exit(ExitCodes.FAIL);
