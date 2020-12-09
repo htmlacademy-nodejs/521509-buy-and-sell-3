@@ -11,11 +11,44 @@
  *  @module src/service/cli/generate
 */
 
-const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFile} = require(`../../utils`);
+const path = require(`path`);
 
+const chalk = require(`chalk`);
+
+const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFileInJSON} = require(`../../utils`);
+const {ExitCodes} = require(`../../consts`);
+
+/**
+ * Число объявлений по умолчанию
+ * @const
+ * @type {number}
+ * @default
+ */
 const DEFAULT_COUNT = 1;
+
+/**
+ * Максимальное число генерируемых объявлений
+ * @const
+ * @type {number}
+ * @default
+ */
 const MAX_COUNT = 1000;
+
+/**
+ * Название файла для записи результата
+ * @const
+ * @type {string}
+ * @default
+ */
 const FILE_NAME = `mocks.json`;
+
+/**
+ * Относительный путь к месту сохранения файла
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATCH_TO_FOLDER = `../../../`;
 
 const SALE_TITLES = [
   `Продам книги Стивена Кинга`,
@@ -134,14 +167,20 @@ module.exports = {
     const [count] = args;
     const countNumber = Number.parseInt(count, 10) || DEFAULT_COUNT;
     if (countNumber > MAX_COUNT) {
-      console.info(
+      console.error(chalk.red(
           `Указано число объявлений больше ${MAX_COUNT}. \nУкажи не больше ${MAX_COUNT} объявлений`
-      );
+      ));
       return;
     }
 
-    await writeFile(FILE_NAME, generateOffers(countNumber));
-    console.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`);
+    try {
+      const absoluteFilePath = path.join(__dirname, PATCH_TO_FOLDER, FILE_NAME);
+      await writeFileInJSON(absoluteFilePath, generateOffers(countNumber));
+      console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.\nАбсолютный путь до файла: ${absoluteFilePath}`));
+    } catch (e) {
+      console.error(chalk.red(`Ошибка записи в файл ${FILE_NAME} ${e}`));
+      process.exit(ExitCodes.FAIL);
+    }
 
   }
 };
