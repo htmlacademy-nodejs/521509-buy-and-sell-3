@@ -11,9 +11,10 @@
  *  @module src/service/cli/generate
 */
 
+const chalk = require(`chalk`);
+
 const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFileInJSON} = require(`../../utils`);
 const {ExitCodes} = require(`../../consts`);
-const chalk = require(`chalk`);
 
 /**
  * Число объявлений по умолчанию
