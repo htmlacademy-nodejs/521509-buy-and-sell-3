@@ -69,9 +69,9 @@ const getRandomItemsInArray = (array) => {
  * await writeFile('test.txt', 'This is test string');
  */
 
-const writeFile = async (filePath, data) => {
+const writeFileInJSON = async (filePath, data) => {
   const content = JSON.stringify(data);
-  return await fs.writeFile(filePath, content);
+  await fs.writeFile(filePath, content);
 };
 
 
@@ -79,5 +79,5 @@ module.exports = {
   getRandomNumber,
   getRandomItemInArray,
   getRandomItemsInArray,
-  writeFile
+  writeFileInJSON
 };

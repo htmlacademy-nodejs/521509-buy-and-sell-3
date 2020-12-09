@@ -11,7 +11,7 @@
  *  @module src/service/cli/generate
 */
 
-const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFile} = require(`../../utils`);
+const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFileInJSON} = require(`../../utils`);
 const {ExitCodes} = require(`../../consts`);
 const chalk = require(`chalk`);
 
@@ -163,7 +163,7 @@ module.exports = {
     }
 
     try {
-      await writeFile(FILE_NAME, generateOffers(countNumber));
+      await writeFileInJSON(FILE_NAME, generateOffers(countNumber));
       console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.`));
     } catch (e) {
       console.error(chalk.red(`Ошибка записи в файл ${FILE_NAME} ${e}`));
