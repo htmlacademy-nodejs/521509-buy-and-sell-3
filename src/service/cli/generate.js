@@ -15,7 +15,12 @@ const path = require(`path`);
 
 const chalk = require(`chalk`);
 
-const {getRandomNumber, getRandomItemInArray, getRandomItemsInArray, writeFileInJSON} = require(`../../utils`);
+const {
+  getRandomNumber,
+  getRandomItemInArray,
+  getRandomItemsInArray,
+  writeFileInJSON,
+  readFileToArray} = require(`../../utils`);
 const {ExitCodes} = require(`../../consts`);
 
 /**
@@ -43,54 +48,45 @@ const MAX_COUNT = 1000;
 const FILE_NAME = `mocks.json`;
 
 /**
- * Относительный путь к месту сохранения файла
+ * Относительный путь к корневому каталогу
  * @const
  * @type {string}
  * @default
  */
 const PATH_TO_ROOT_FOLDER = `../../../`;
 
-const SALE_TITLES = [
-  `Продам книги Стивена Кинга`,
-  `Продам новую приставку Sony Playstation 5`,
-  `Продам отличную подборку фильмов на VHS`,
-  `Продам коллекцию журналов «Огонёк»`,
-  `Отдам в хорошие руки подшивку «Мурзилка»`,
-  `Продам советскую посуду. Почти не разбита`
-];
+/**
+ * Путь к файлу с категориями относительно корневого каталога
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_CATEGORIES = `data/categories.txt`;
 
-const OFFER_TITLES = [
-  `Куплю антиквариат`,
-  `Куплю породистого кота`,
-  `Куплю детские санки`
-];
+/**
+ * Путь к файлу с заголовками предложений относительно корневого каталога
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_OFFER_TITLES = `data/offer-titles.txt`;
 
-const SENTENCES = [
-  `Товар в отличном состоянии.`,
-  `Пользовались бережно и только по большим праздникам.`,
-  `Продаю с болью в сердце...`,
-  `Бонусом отдам все аксессуары.`,
-  `Даю недельную гарантию.`,
-  `Если товар не понравится — верну всё до последней копейки.`,
-  `Это настоящая находка для коллекционера!`,
-  `Если найдёте дешевле — сброшу цену.`,
-  `Таких предложений больше нет!`,
-  `Две страницы заляпаны свежим кофе.`,
-  `При покупке с меня бесплатная доставка в черте города.`,
-  `Кажется, что это хрупкая вещь.`,
-  `Мой дед не мог её сломать.`,
-  `Кому нужен этот новый телефон, если тут такое...`,
-  `Не пытайтесь торговаться. Цену вещам я знаю.`
-];
+/**
+ * Путь к файлу с заголовками продаж относительно корневого каталога
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_SALE_TITLES = `data/sale-titles.txt`;
 
-const CATEGORIES = [
-  `Книги`,
-  `Разное`,
-  `Посуда`,
-  `Игры`,
-  `Животные`,
-  `Журналы`,
-];
+/**
+ * Путь к файлу с текстом для объявлений относительно корневого каталога
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_SENTENCES = `data/sentences.txt`;
+
 
 const OfferType = {
   OFFER: `offer`,
@@ -103,6 +99,10 @@ const SumRestrict = {
   MAX: 100000,
 };
 
+let categories;
+let offerTitles;
+let saleTitles;
+let sentences;
 
 /**
  * generateOffer - генерирует случайное объявление согласно заданию:
@@ -131,11 +131,11 @@ const generateOffer = () => {
   const type = Math.random() > 0.5 ? OfferType.OFFER : OfferType.SALE;
   return {
     type,
-    title: (type === OfferType.OFFER) ? getRandomItemInArray(OFFER_TITLES) : getRandomItemInArray(SALE_TITLES),
+    title: (type === OfferType.OFFER) ? getRandomItemInArray(offerTitles) : getRandomItemInArray(saleTitles),
     picture: `item${getRandomNumber(1, 16)}.jpg`,
-    description: getRandomItemsInArray(SENTENCES).join(` `),
+    description: getRandomItemsInArray(sentences).join(` `),
     sum: getRandomNumber(SumRestrict.MIN, SumRestrict.MAX),
-    category: getRandomItemsInArray(CATEGORIES)
+    category: getRandomItemsInArray(categories)
   };
 };
 
@@ -154,6 +154,24 @@ const generateOffers = (count) => {
   return result;
 };
 
+
+/**
+ * Читает данные из файлов, превращая пути в абсолютные и переопределяет ошибку, если что-то пошло не так.
+ *
+ * @param {string} filePath - принимает относительный путь (относительно корня проекта)
+ * @return {Promise<Array|*[]>} - возвращает promise с массивом
+ */
+const readDataForGeneration = async (filePath) => {
+  try {
+    const absolutePath = path.join(__dirname, PATH_TO_ROOT_FOLDER, filePath);
+    const contentArray = await readFileToArray(absolutePath);
+    return contentArray;
+  } catch (error) {
+    await Promise.reject(filePath);
+    return [];
+  }
+};
+
 module.exports = {
   name: `--generate`,
 
@@ -170,6 +188,26 @@ module.exports = {
       console.error(chalk.red(
           `Указано число объявлений больше ${MAX_COUNT}. \nУкажи не больше ${MAX_COUNT} объявлений`
       ));
+      return;
+    }
+
+    // Комментарий-вопрос наставнику: я нашел, что можно так делать, что результат промисов возвращается в том же порядке, как они отдавались в промис алл.
+    // Тесты мои показали, что все работает так как нужно.
+    // Но меня немного смущает это конструкция ниже. Может можно изящнее?
+    try {
+      await Promise.all([
+        readDataForGeneration(PATH_TO_CATEGORIES),
+        readDataForGeneration(PATH_TO_OFFER_TITLES),
+        readDataForGeneration(PATH_TO_SALE_TITLES),
+        readDataForGeneration(PATH_TO_SENTENCES)])
+        .then((results) => {
+          categories = results[0];
+          offerTitles = results[1];
+          saleTitles = results[2];
+          sentences = results[3];
+        });
+    } catch (e) {
+      console.error(chalk.red(`Не удалось прочитать один из файлов ${e}`));
       return;
     }
 
