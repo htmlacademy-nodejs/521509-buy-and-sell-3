@@ -99,15 +99,14 @@ const SumRestrict = {
   MAX: 100000,
 };
 
-let categories;
-let offerTitles;
-let saleTitles;
-let sentences;
-
 /**
  * generateOffer - генерирует случайное объявление согласно заданию:
  * Каждое объявление представлено в виде объекта с полями:
  *
+ * @param {[string]} categories - массив категорий
+ * @param {[string]} offerTitles - массив заголовков предложений
+ * @param {[string]} saleTitles - массив заголовков продаж
+ * @param {[string]} sentences - массив текстовых предложений для объявления
  * @return {Object} - Возвращает сгенерированное объявление
  * title. Строка. Заголовок объявления;
  * picture. Строка. Имя файла с изображением. Для имени используйте itemXX.jpg, где XX значение от 01 до 16;
@@ -127,7 +126,7 @@ let sentences;
  *  }]
  */
 
-const generateOffer = () => {
+const generateOffer = (categories, offerTitles, saleTitles, sentences) => {
   const type = Math.random() > 0.5 ? OfferType.OFFER : OfferType.SALE;
   return {
     type,
@@ -141,15 +140,19 @@ const generateOffer = () => {
 
 
 /**
- * generateOffers - генерирует count число объявлений с помощью функции generateOffer()
+ *  generateOffers - генерирует count число объявлений с помощью функции generateOffer()
  *
  * @param {Number} count - число объявлений, которые нужно сгенерировать
+ * @param {[string]} categories - массив категорий
+ * @param {[string]} offerTitles - массив заголовков предложений
+ * @param {[string]} saleTitles - массив заголовков продаж
+ * @param {[string]} sentences - массив текстовых предложений для объявления
  * @return {Array} - возвращает массив созданных объявлений
  */
-const generateOffers = (count) => {
+const generateOffers = (count, categories, offerTitles, saleTitles, sentences) => {
   const result = [];
   for (let i = 0; i < count; i++) {
-    result.push(generateOffer());
+    result.push(generateOffer(categories, offerTitles, saleTitles, sentences));
   }
   return result;
 };
@@ -167,8 +170,7 @@ const readDataForGeneration = async (filePath) => {
     const contentArray = await readFileToArray(absolutePath);
     return contentArray;
   } catch (error) {
-    await Promise.reject(filePath);
-    return [];
+    throw new Error(`Не удалось прочитать файл ${filePath}: ${error.message}`);
   }
 };
 
@@ -191,32 +193,19 @@ module.exports = {
       return;
     }
 
-    // Комментарий-вопрос наставнику: я нашел, что можно так делать, что результат промисов возвращается в том же порядке, как они отдавались в промис алл.
-    // Тесты мои показали, что все работает так как нужно.
-    // Но меня немного смущает это конструкция ниже. Может можно изящнее?
+    let categories; let offerTitles; let saleTitles; let sentences;
+
     try {
-      await Promise.all([
+      [categories, offerTitles, saleTitles, sentences] = await Promise.all([
         readDataForGeneration(PATH_TO_CATEGORIES),
         readDataForGeneration(PATH_TO_OFFER_TITLES),
         readDataForGeneration(PATH_TO_SALE_TITLES),
-        readDataForGeneration(PATH_TO_SENTENCES)])
-        .then((results) => {
-          categories = results[0];
-          offerTitles = results[1];
-          saleTitles = results[2];
-          sentences = results[3];
-        });
-    } catch (e) {
-      console.error(chalk.red(`Не удалось прочитать один из файлов ${e}`));
-      return;
-    }
-
-    try {
+        readDataForGeneration(PATH_TO_SENTENCES)]);
       const absoluteFilePath = path.join(__dirname, PATH_TO_ROOT_FOLDER, FILE_NAME);
-      await writeFileInJSON(absoluteFilePath, generateOffers(countNumber));
+      await writeFileInJSON(absoluteFilePath, generateOffers(countNumber, categories, offerTitles, saleTitles, sentences));
       console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.\nАбсолютный путь до файла: ${absoluteFilePath}`));
-    } catch (e) {
-      console.error(chalk.red(`Ошибка записи в файл ${FILE_NAME} ${e}`));
+    } catch (error) {
+      console.error(chalk.red(`Ошибка: ${error.message}`));
       process.exit(ExitCodes.FAIL);
     }
 
