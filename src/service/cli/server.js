@@ -110,7 +110,6 @@ module.exports = {
   async run(args) {
     const [port] = args;
     const portNumber = Number.parseInt(port, 10) || DEFAULT_PORT;
-    console.log(portNumber);
 
     http.createServer(onClientConnect)
       .listen(portNumber)
