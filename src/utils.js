@@ -70,7 +70,7 @@ const getRandomItemsInArray = (array) => {
  */
 
 const writeFileInJSON = async (filePath, data) => {
-  const content = JSON.stringify(data);
+  const content = JSON.stringify(data, null, 2);
   await fs.writeFile(filePath, content);
 };
 
@@ -86,10 +86,23 @@ const readFileToArray = async (filePath, encoding = `utf8`) => {
   return data.split(`\n`);
 };
 
+/**
+ * Читает файл, c JSON информацией и возвращает прочитанный объект.
+ *
+ * @param {string} filePath - абсолютный путь до файла
+ * @param {string} encoding - кодировка, по умолчанию utf8
+ * @return {Promise.<Object>} - объект со информацией.
+ */
+const readFileInJSON = async (filePath, encoding = `utf8`) => {
+  const data = await fs.readFile(filePath, encoding);
+  return JSON.parse(data);
+};
+
 module.exports = {
   getRandomNumber,
   getRandomItemInArray,
   getRandomItemsInArray,
   writeFileInJSON,
-  readFileToArray
+  readFileToArray,
+  readFileInJSON
 };
