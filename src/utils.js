@@ -70,7 +70,7 @@ const getRandomItemsInArray = (array) => {
  */
 
 const writeFileInJSON = async (filePath, data) => {
-  const content = JSON.stringify(data);
+  const content = JSON.stringify(data, null, 2);
   await fs.writeFile(filePath, content);
 };
 
