@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Роутер для корневого пути. ('/')
+ *
+ * @module /src/express/routes/main-routes
+ */
+
 const {Router} = require(`express`);
 
 const mainRoutes = new Router();

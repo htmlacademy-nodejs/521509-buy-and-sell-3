@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Роутер для объявлений. ('/offers')
+ *
+ * @module /src/express/routes/offers-routes
+ */
+
 const {Router} = require(`express`);
 
 const offersRoutes = new Router();

@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Роутер для личного кабинета. ('/my')
+ *
+ * @module /src/express/routes/my-routes
+ */
+
 const {Router} = require(`express`);
 
 const myRoutes = new Router();
