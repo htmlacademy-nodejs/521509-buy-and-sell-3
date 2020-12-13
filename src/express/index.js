@@ -24,19 +24,34 @@ const offersRoutes = require(`./routes/offers-routes`);
 const PORT_NUMBER = 8080;
 
 /**
- * Путь до папки public. Она будет будет полностью доступна с помощью express.static.
+ * Путь до папки со статикой public. Она будет будет полностью доступна с помощью express.static.
  *
  * @const
  * @type {string}
  * @default
  */
-const PUBLIC_PATH_DIR = `public`;
+const PATH_TO_PUBLIC_DIR = `public`;
+
+/**
+ * Путь до папки с шаблономи.
+ *
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_TEMPLATES_DIR = `templates`;
 
 /**
  * Создаем экземпляр Express.
  * @type {*|Express}
  */
 const app = express();
+
+/**
+ * Устанавливаем pug, как шаблонизатор по умолчанию и указываем путь до шаблонов.
+ */
+app.set(`views`, path.resolve(__dirname, PATH_TO_TEMPLATES_DIR));
+app.set(`view engine`, `pug`);
 
 /**
  * Подключаем Router'ы для путей.
@@ -48,7 +63,7 @@ app.use(`/offers`, offersRoutes);
 /**
  * Добавляем отдачу статичных файлов.
  */
-app.use(express.static(path.resolve(__dirname, PUBLIC_PATH_DIR)));
+app.use(express.static(path.resolve(__dirname, PATH_TO_PUBLIC_DIR)));
 
 /**
  * Запускаем сервер
