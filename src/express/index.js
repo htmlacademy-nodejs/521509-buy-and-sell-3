@@ -65,6 +65,14 @@ app.use(`/offers`, offersRoutes);
  */
 app.use(express.static(path.resolve(__dirname, PATH_TO_PUBLIC_DIR)));
 
+
+/**
+ * Добавляем обработчики ошибок.
+ */
+app.use((req, res) => res.status(404).render(`errors/404`));
+// Для обработки ошибок нужно передать 4 аргумента, но eslint ругается на next, который не используется.
+app.use((err, req, res, next) => res.status(500).render(`errors/500`)); // eslint-disable-line
+
 /**
  * Запускаем сервер
  */
