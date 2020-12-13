@@ -10,9 +10,9 @@ const {Router} = require(`express`);
 
 const mainRoutes = new Router();
 
-mainRoutes.get(`/`, (req, res) => res.send(`/`));
-mainRoutes.get(`/register`, (req, res) => res.send(`/register`));
+mainRoutes.get(`/`, (req, res) => res.render(`pages/main`));
+mainRoutes.get(`/register`, (req, res) => res.render(`pages/register`));
 mainRoutes.get(`/login`, (req, res) => res.render(`pages/login`));
-mainRoutes.get(`/search`, (req, res) => res.send(`/search`));
+mainRoutes.get(`/search`, (req, res) => res.render(`pages/search`));
 
 module.exports = mainRoutes;
