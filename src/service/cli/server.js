@@ -1,15 +1,15 @@
 'use strict';
 
 /**
- * Этот модуль запускает сервер.
+ * Этот модуль запускает сервер для API.
  *
  *  @module src/service/cli/server
  */
 
 const path = require(`path`);
-const http = require(`http`);
 
 const chalk = require(`chalk`);
+const express = require(`express`);
 
 const {HttpCode} = require(`../../consts`);
 const {readFileInJSON} = require(`../../utils`);
@@ -46,55 +46,18 @@ const FILE_NAME = `mocks.json`;
  */
 const PATH_TO_ROOT_FOLDER = `../../../`;
 
-
 /**
- * Функция для ответа пользователю. Принимает объект для ответа, код статуса и сообщение.
- * Вызывает метод для отправки ответа.
+ * Функция отдает все объявления, которые есть в файле с моками.
  *
- * @param {Object} res - объект для ответа клиенту
- * @param {string} statusCode - код ответа
- * @param {string} message - сообщение для пользователя
+ * @return {Array} - Возвращает массив с прочитанными данными или пустой массив, если данных нет.
  */
-const sendResponse = (res, statusCode, message) => {
-  const template = `
-    <!Doctype html>
-      <html lang="ru">
-      <head>
-        <title>Доска объявлений</title>
-      </head>
-      <body>${message}</body>
-    </html>`.trim();
-
-  res.statusCode = statusCode;
-  res.writeHead(statusCode, {
-    'Content-Type': `text/html; charset=UTF-8`,
-  });
-
-  res.end(template);
-};
-
-/**
- * Функция для обработки запроса от пользователя. Временно содержит роутинг.
- *
- * @param {Object} req - объект запроса к серверу
- * @param {Object} res - объект для ответа клиенту
- */
-const onClientConnect = async (req, res) => {
-  switch (req.url) {
-    case `/` : {
-      try {
-        const adverts = await readFileInJSON(path.join(__dirname, PATH_TO_ROOT_FOLDER, FILE_NAME));
-        const message = `<ul>${adverts.map((advert) => `<li>${advert.title}</li>`).join(``)}</ul>`;
-        sendResponse(res, HttpCode.OK, message);
-      } catch (e) {
-        sendResponse(res, HttpCode.NOT_FOUND, NOT_FOUND_MESSAGE);
-      }
-      break;
-    }
-    default : {
-      sendResponse(res, HttpCode.NOT_FOUND, NOT_FOUND_MESSAGE);
-      break;
-    }
+const getOffers = async () => {
+  try {
+    const offers = await readFileInJSON(path.join(__dirname, PATH_TO_ROOT_FOLDER, FILE_NAME));
+    return offers;
+  } catch (error) {
+    console.log(chalk.red(`Не удалось прочитать файл с данными ${FILE_NAME}: ${error.message}`));
+    return [];
   }
 };
 
@@ -111,15 +74,22 @@ module.exports = {
     const [port] = args;
     const portNumber = Number.parseInt(port, 10) || DEFAULT_PORT;
 
-    http.createServer(onClientConnect)
-      .listen(portNumber)
-      .on(`listening`, (err) => {
-        if (err) {
-          console.log(chalk.red(`Ошибка при создании сервера: ${portNumber}`));
-          return;
-        }
+    const app = express();
+    app.use(express.json());
 
-        console.log(chalk.green(`Сервер поднят успешно на порту: ${portNumber}`));
-      });
+    app.get(`/offers`, (async (req, res) => {
+      res.send(await getOffers());
+    }));
+
+    app.use((req, res) => res.status(HttpCode.NOT_FOUND).send(NOT_FOUND_MESSAGE));
+
+    app.listen(portNumber, (err) => {
+      if (err) {
+        console.log(chalk.red(`Ошибка при создании сервера: ${portNumber}`));
+        return;
+      }
+
+      console.log(chalk.green(`Сервер поднят успешно на порту: ${portNumber}`));
+    });
   }
 };
