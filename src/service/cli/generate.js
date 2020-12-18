@@ -14,6 +14,7 @@
 const path = require(`path`);
 
 const chalk = require(`chalk`);
+const {nanoid} = require(`nanoid`);
 
 const {
   getRandomNumber,
@@ -38,6 +39,14 @@ const DEFAULT_COUNT = 1;
  * @default
  */
 const MAX_COUNT = 1000;
+
+/**
+ * Длина генерируемых id по умолчанию.
+ * @const
+ * @type {number}
+ * @default 5
+ */
+const MAX_ID_LENGTH = 5;
 
 /**
  * Название файла для записи результата
@@ -117,6 +126,7 @@ const SumRestrict = {
  *
  * Пример:
  * [{
+ *  "id": "sadAd",
  *  "type": "offer",
  *  "title": "Продам новую приставку Sony Playstation 5",
  *  "description": "Если товар не понравится — верну всё до последней копейки. Пользовались бережно и только по большим праздникам. Продаю с болью в сердце... Товар в отличном состоянии.",
@@ -130,6 +140,7 @@ const generateOffer = (categories, offerTitles, saleTitles, sentences) => {
   const type = Math.random() > 0.5 ? OfferType.OFFER : OfferType.SALE;
   return {
     type,
+    id: nanoid(MAX_ID_LENGTH),
     title: (type === OfferType.OFFER) ? getRandomItemInArray(offerTitles) : getRandomItemInArray(saleTitles),
     picture: `item${getRandomNumber(1, 16)}.jpg`,
     description: getRandomItemsInArray(sentences).join(` `),
