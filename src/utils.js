@@ -75,7 +75,7 @@ const writeFileInJSON = async (filePath, data) => {
 };
 
 /**
- * Читает файл, режет по \n, и отдает массив с прочитанной информацией.
+ * Читает файл и отдает отфильтрованный массив без пустых элементов и лишних пробелов.
  *
  * @param {string} filePath - абсолютный путь до файла
  * @param {string} encoding - кодировка, по умолчанию utf8
@@ -83,7 +83,7 @@ const writeFileInJSON = async (filePath, data) => {
  */
 const readFileToArray = async (filePath, encoding = `utf8`) => {
   const data = await fs.readFile(filePath, encoding);
-  return data.split(`\n`);
+  return data.split(`\n`).map((it) => it.trim()).filter((it) => it.length !== 0);
 };
 
 /**
