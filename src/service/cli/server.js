@@ -6,13 +6,11 @@
  *  @module src/service/cli/server
  */
 
-const path = require(`path`);
-
 const chalk = require(`chalk`);
 const express = require(`express`);
 
 const {HttpCode} = require(`../../consts`);
-const {readFileInJSON} = require(`../../utils`);
+const {getMockData} = require(`../lib/get-mock-data`);
 
 /**
  * Порт по умолчанию
@@ -30,36 +28,6 @@ const DEFAULT_PORT = 3000;
  */
 const NOT_FOUND_MESSAGE = `Not found`;
 
-/**
- * Название файла для записи результата
- * @const
- * @type {string}
- * @default
- */
-const FILE_NAME = `mocks.json`;
-
-/**
- * Относительный путь к корневому каталогу
- * @const
- * @type {string}
- * @default
- */
-const PATH_TO_ROOT_FOLDER = `../../../`;
-
-/**
- * Функция отдает все объявления, которые есть в файле с моками.
- *
- * @return {Array} - Возвращает массив с прочитанными данными или пустой массив, если данных нет.
- */
-const getOffers = async () => {
-  try {
-    const offers = await readFileInJSON(path.join(__dirname, PATH_TO_ROOT_FOLDER, FILE_NAME));
-    return offers;
-  } catch (error) {
-    console.log(chalk.red(`Не удалось прочитать файл с данными ${FILE_NAME}: ${error.message}`));
-    return [];
-  }
-};
 
 module.exports = {
   name: `--server`,
@@ -78,7 +46,7 @@ module.exports = {
     app.use(express.json());
 
     app.get(`/offers`, (async (req, res) => {
-      res.send(await getOffers());
+      res.send(await getMockData());
     }));
 
     app.use((req, res) => res.status(HttpCode.NOT_FOUND).send(NOT_FOUND_MESSAGE));
