@@ -49,6 +49,14 @@ const MAX_COUNT = 1000;
 const MAX_ID_LENGTH = 5;
 
 /**
+ * Максимальное число комментариев
+ * @const
+ * @type {number}
+ * @default 15
+ */
+const MAX_COMMENTS_COUNT = 15;
+
+/**
  * Название файла для записи результата
  * @const
  * @type {string}
@@ -96,6 +104,14 @@ const PATH_TO_SALE_TITLES = `data/sale-titles.txt`;
  */
 const PATH_TO_SENTENCES = `data/sentences.txt`;
 
+/**
+ * Путь к файлу с текстом комментариев относительно корневого каталога
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_COMMENTS_SENTENCES = `data/comments.txt`;
+
 
 const OfferType = {
   OFFER: `offer`,
@@ -108,6 +124,15 @@ const SumRestrict = {
   MAX: 100000,
 };
 
+
+const generateComment = (commentsSentences) => {
+  return {
+    id: nanoid(MAX_ID_LENGTH),
+    text: getRandomItemsInArray(commentsSentences).join(``)
+  };
+};
+
+
 /**
  * generateOffer - генерирует случайное объявление согласно заданию:
  * Каждое объявление представлено в виде объекта с полями:
@@ -116,6 +141,7 @@ const SumRestrict = {
  * @param {[string]} offerTitles - массив заголовков предложений
  * @param {[string]} saleTitles - массив заголовков продаж
  * @param {[string]} sentences - массив текстовых предложений для объявления
+ * @param {[string]} commentsSentences - массив текстовых предложений для комментариев
  * @return {Object} - Возвращает сгенерированное объявление
  * title. Строка. Заголовок объявления;
  * picture. Строка. Имя файла с изображением. Для имени используйте itemXX.jpg, где XX значение от 01 до 16;
@@ -136,7 +162,7 @@ const SumRestrict = {
  *  }]
  */
 
-const generateOffer = (categories, offerTitles, saleTitles, sentences) => {
+const generateOffer = (categories, offerTitles, saleTitles, sentences, commentsSentences) => {
   const type = Math.random() > 0.5 ? OfferType.OFFER : OfferType.SALE;
   return {
     type,
@@ -145,7 +171,8 @@ const generateOffer = (categories, offerTitles, saleTitles, sentences) => {
     picture: `item${getRandomNumber(1, 16)}.jpg`,
     description: getRandomItemsInArray(sentences).join(` `),
     sum: getRandomNumber(SumRestrict.MIN, SumRestrict.MAX),
-    category: getRandomItemsInArray(categories)
+    category: getRandomItemsInArray(categories),
+    comments: Array(getRandomNumber(0, MAX_COMMENTS_COUNT)).fill({}).map(() => generateComment(commentsSentences))
   };
 };
 
@@ -158,12 +185,13 @@ const generateOffer = (categories, offerTitles, saleTitles, sentences) => {
  * @param {[string]} offerTitles - массив заголовков предложений
  * @param {[string]} saleTitles - массив заголовков продаж
  * @param {[string]} sentences - массив текстовых предложений для объявления
+ * @param {[string]} commentsSentences - массив текстовых предложений для комментариев
  * @return {Array} - возвращает массив созданных объявлений
  */
-const generateOffers = (count, categories, offerTitles, saleTitles, sentences) => {
+const generateOffers = (count, categories, offerTitles, saleTitles, sentences, commentsSentences) => {
   const result = [];
   for (let i = 0; i < count; i++) {
-    result.push(generateOffer(categories, offerTitles, saleTitles, sentences));
+    result.push(generateOffer(categories, offerTitles, saleTitles, sentences, commentsSentences));
   }
   return result;
 };
@@ -204,16 +232,18 @@ module.exports = {
       return;
     }
 
-    let categories; let offerTitles; let saleTitles; let sentences;
+    let categories; let offerTitles; let saleTitles; let sentences; let commentsSentences;
 
     try {
-      [categories, offerTitles, saleTitles, sentences] = await Promise.all([
+      [categories, offerTitles, saleTitles, sentences, commentsSentences] = await Promise.all([
         readDataForGeneration(PATH_TO_CATEGORIES),
         readDataForGeneration(PATH_TO_OFFER_TITLES),
         readDataForGeneration(PATH_TO_SALE_TITLES),
-        readDataForGeneration(PATH_TO_SENTENCES)]);
+        readDataForGeneration(PATH_TO_SENTENCES),
+        readDataForGeneration(PATH_TO_COMMENTS_SENTENCES)
+      ]);
       const absoluteFilePath = path.join(__dirname, PATH_TO_ROOT_FOLDER, FILE_NAME);
-      await writeFileInJSON(absoluteFilePath, generateOffers(countNumber, categories, offerTitles, saleTitles, sentences));
+      await writeFileInJSON(absoluteFilePath, generateOffers(countNumber, categories, offerTitles, saleTitles, sentences, commentsSentences));
       console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.\nАбсолютный путь до файла: ${absoluteFilePath}`));
     } catch (error) {
       console.error(chalk.red(`Ошибка: ${error.message}`));
