@@ -47,11 +47,23 @@ const HttpCode = {
   INTERNAL_SERVER_ERROR: 500,
   FORBIDDEN: 403,
   UNAUTHORIZED: 401,
+  CREATED: 201,
+  DELETED: 204,
+  BAD_REQUEST: 400
 };
+
+/**
+ * Длина генерируемых id по умолчанию.
+ * @const
+ * @type {number}
+ * @default 5
+ */
+const MAX_ID_LENGTH = 5;
 
 module.exports = {
   DEFAULT_COMMAND,
   ExitCodes,
   USER_ARGV_INDEX,
-  HttpCode
+  HttpCode,
+  MAX_ID_LENGTH
 };
