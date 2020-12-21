@@ -9,8 +9,9 @@
 const chalk = require(`chalk`);
 const express = require(`express`);
 
+const routes = require(`../api-routes`);
 const {HttpCode} = require(`../../consts`);
-const {getMockData} = require(`../lib/get-mock-data`);
+
 
 /**
  * Порт по умолчанию
@@ -44,10 +45,8 @@ module.exports = {
 
     const app = express();
     app.use(express.json());
+    app.use(`/api`, routes);
 
-    app.get(`/offers`, (async (req, res) => {
-      res.send(await getMockData());
-    }));
 
     app.use((req, res) => res.status(HttpCode.NOT_FOUND).send(NOT_FOUND_MESSAGE));
 
