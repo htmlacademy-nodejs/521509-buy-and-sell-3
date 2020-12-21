@@ -22,7 +22,7 @@ const {
   getRandomItemsInArray,
   writeFileInJSON,
   readFileToArray} = require(`../../utils`);
-const {ExitCodes} = require(`../../consts`);
+const {ExitCodes, MAX_ID_LENGTH} = require(`../../consts`);
 
 /**
  * Число объявлений по умолчанию
@@ -39,14 +39,6 @@ const DEFAULT_COUNT = 1;
  * @default
  */
 const MAX_COUNT = 1000;
-
-/**
- * Длина генерируемых id по умолчанию.
- * @const
- * @type {number}
- * @default 5
- */
-const MAX_ID_LENGTH = 5;
 
 /**
  * Максимальное число комментариев
