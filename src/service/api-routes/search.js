@@ -4,7 +4,7 @@ const {Router} = require(`express`);
 const {HttpCode} = require(`../../consts`);
 
 
-module.exports = (app, searchService) => {
+module.exports = (searchService) => {
   const router = new Router();
 
   router.get(`/`, (req, res) => {

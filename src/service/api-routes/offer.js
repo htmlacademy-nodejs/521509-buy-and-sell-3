@@ -9,7 +9,7 @@ const commentExists = require(`../middlewares/comment-exists`);
 const commentValidator = require(`../middlewares/comment-validator`);
 
 
-module.exports = (app, offerService, commentService) => {
+module.exports = (offerService, commentService) => {
   const router = new Router();
 
 
