@@ -14,7 +14,7 @@ module.exports = (service) => (req, res, next) => {
     res.locals.offer = service.getOne(offerId);
     next();
   } catch (err) {
-    res.status(HttpCode.NOT_FOUND).send(err.message);
+    res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Offer doesn't exist`, details: err.message}});
   }
 
 

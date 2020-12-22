@@ -6,23 +6,21 @@
 
 const {HttpCode} = require(`../../consts`);
 
-const requiredOfferKeys = [`type`, `title`, `picture`, `description`, `sum`, `category`];
+const REQUIRED_OFFER_KEYS = [`type`, `title`, `picture`, `description`, `sum`, `category`];
 
 module.exports = (req, res, next) => {
   const offer = req.body;
   const errors = [];
   const keys = Object.keys(offer);
 
-  let isOk = true;
-  requiredOfferKeys.forEach((key) => {
+  REQUIRED_OFFER_KEYS.forEach((key) => {
     if (!keys.includes(key)) {
       errors.push(`Key "${key}" is not presented.`);
-      isOk = false;
     }
   });
 
-  if (!isOk) {
-    res.status(HttpCode.BAD_REQUEST).send(`Offer validation failed. \n ${errors.join(`\n`)}`);
+  if (errors.length) {
+    res.status(HttpCode.BAD_REQUEST).json({error: {code: HttpCode.BAD_REQUEST, message: `Offer validation failed`, details: errors}});
     return;
   }
 

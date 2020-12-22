@@ -7,14 +7,14 @@
 
 const {HttpCode} = require(`../../consts`);
 
-module.exports = (service) => (req, res, next) => {
+module.exports = (commentService) => (req, res, next) => {
   const {offer} = res.locals;
   const commentId = req.params[`commentId`];
 
   try {
-    res.locals.comment = service.getOne(offer, commentId);
+    res.locals.comment = commentService.getOne(offer, commentId);
     next();
   } catch (err) {
-    res.status(HttpCode.NOT_FOUND).send(err.message);
+    res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Comment doesn't exist`, details: err.message}});
   }
 };

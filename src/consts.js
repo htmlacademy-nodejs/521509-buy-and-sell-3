@@ -60,10 +60,19 @@ const HttpCode = {
  */
 const MAX_ID_LENGTH = 5;
 
+/**
+ * Путь(роут) АПИ по умолчанию.
+ * @const
+ * @type {string}
+ * @default /api
+ */
+const API_PREFIX = `/api`;
+
 module.exports = {
   DEFAULT_COMMAND,
   ExitCodes,
   USER_ARGV_INDEX,
   HttpCode,
-  MAX_ID_LENGTH
+  MAX_ID_LENGTH,
+  API_PREFIX
 };

@@ -3,22 +3,22 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../consts`);
 
-const router = new Router();
 
-module.exports = (app, service) => {
-  app.use(`/search`, router);
+module.exports = (app, searchService) => {
+  const router = new Router();
 
   router.get(`/`, (req, res) => {
     const {query = ``} = req.query;
 
     if (!query) {
-      res.status(HttpCode.BAD_REQUEST).json([]);
+      res.status(HttpCode.BAD_REQUEST).json({error: {code: HttpCode.BAD_REQUEST, message: `Query string is empty.`, details: `Query string is empty. Check it.`}});
       return;
     }
 
-    const searchResults = service.searchByTitle(query);
+    const searchResults = searchService.searchByTitle(query);
 
     res.status(HttpCode.OK).json(searchResults);
   });
 
+  return router;
 };

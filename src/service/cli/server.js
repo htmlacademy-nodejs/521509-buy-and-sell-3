@@ -10,7 +10,7 @@ const chalk = require(`chalk`);
 const express = require(`express`);
 
 const routes = require(`../api-routes`);
-const {HttpCode} = require(`../../consts`);
+const {HttpCode, API_PREFIX} = require(`../../consts`);
 
 
 /**
@@ -20,15 +20,6 @@ const {HttpCode} = require(`../../consts`);
  * @default
  */
 const DEFAULT_PORT = 3000;
-
-/**
- * Сообщение по умолчанию, если ресурс не найден
- * @const
- * @type {string}
- * @default
- */
-const NOT_FOUND_MESSAGE = `Not found`;
-
 
 module.exports = {
   name: `--server`,
@@ -45,10 +36,10 @@ module.exports = {
 
     const app = express();
     app.use(express.json());
-    app.use(`/api`, routes);
+    app.use(API_PREFIX, routes);
 
 
-    app.use((req, res) => res.status(HttpCode.NOT_FOUND).send(NOT_FOUND_MESSAGE));
+    app.use((req, res) => res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Not Found`, details: `This endpoint is not presented`}}));
 
     app.listen(portNumber, (err) => {
       if (err) {
