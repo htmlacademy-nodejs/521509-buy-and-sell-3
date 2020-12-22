@@ -59,7 +59,7 @@ const MOCK_DATA = [
 const app = express();
 
 app.use(express.json());
-app.use(`/search`, searchRouter(app, new SearchService(MOCK_DATA)));
+app.use(`/search`, searchRouter(new SearchService(MOCK_DATA)));
 
 let response;
 
