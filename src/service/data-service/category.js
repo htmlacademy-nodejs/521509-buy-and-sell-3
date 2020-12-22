@@ -17,9 +17,9 @@ class CategoryService {
    * @return {String[]}
    */
   getAll() {
-    const categories = new Set();
-    this._offers.forEach((it) => categories.add(...it.category));
-    return [...categories];
+    const categories = [];
+    this._offers.forEach((it) => categories.push(...it.category));
+    return [...new Set(categories)];
   }
 
 }
