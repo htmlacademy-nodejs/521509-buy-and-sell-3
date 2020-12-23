@@ -68,11 +68,24 @@ const MAX_ID_LENGTH = 5;
  */
 const API_PREFIX = `/api`;
 
+
+/**
+ * Переменные окружения. Нужно будет перенести в .env
+ * @const
+ * @type {Object}
+ */
+const Env = {
+  DEVELOPMENT: `development`,
+  PRODUCTION: `production`,
+  TESTING: `testing`
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   ExitCodes,
   USER_ARGV_INDEX,
   HttpCode,
   MAX_ID_LENGTH,
-  API_PREFIX
+  API_PREFIX,
+  Env
 };
