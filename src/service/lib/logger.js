@@ -4,14 +4,33 @@ const pino = require(`pino`);
 const {Env} = require(`../../consts`);
 
 const LOG_FILE = `./logs/api.log`;
-const isDevMode = process.env.NODE_ENV === Env.DEVELOPMENT;
-const defaultLogLevel = isDevMode ? `info` : `error`;
+let defaultLogLevel;
+let logsDestination;
+let isPrettyPrintEnabled;
+
+switch (process.env.NODE_ENV) {
+  case Env.PRODUCTION:
+    defaultLogLevel = `error`;
+    isPrettyPrintEnabled = false;
+    logsDestination = pino.destination(LOG_FILE);
+    break;
+  case Env.TESTING:
+    defaultLogLevel = `silent`;
+    isPrettyPrintEnabled = true;
+    logsDestination = process.stdout;
+    break;
+  default:
+    defaultLogLevel = `debug`;
+    isPrettyPrintEnabled = true;
+    logsDestination = process.stdout;
+    break;
+}
 
 const logger = pino({
   name: `base-logger`,
   level: process.env.LOG_LEVEL || defaultLogLevel,
-  prettyPrint: isDevMode
-}, isDevMode ? process.stdout : pino.destination(LOG_FILE));
+  prettyPrint: isPrettyPrintEnabled
+}, logsDestination);
 
 module.exports = {
   logger,

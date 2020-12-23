@@ -76,7 +76,8 @@ const API_PREFIX = `/api`;
  */
 const Env = {
   DEVELOPMENT: `development`,
-  PRODUCTION: `production`
+  PRODUCTION: `production`,
+  TESTING: `testing`
 };
 
 module.exports = {
