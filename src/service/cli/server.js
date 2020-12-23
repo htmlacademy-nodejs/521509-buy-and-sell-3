@@ -6,12 +6,15 @@
  *  @module src/service/cli/server
  */
 
-const chalk = require(`chalk`);
 const express = require(`express`);
 
 const routes = require(`../api-routes`);
-const {HttpCode, API_PREFIX} = require(`../../consts`);
+const {getLogger} = require(`../lib/logger`);
+const {API_PREFIX, ExitCodes} = require(`../../consts`);
 
+const requestLogger = require(`../middlewares/req-logger`);
+const notFoundMiddleWare = require(`../middlewares/resource-not-found`);
+const internalErrorMiddleWare = require(`../middlewares/intenal-server-error`);
 
 /**
  * Порт по умолчанию
@@ -34,20 +37,24 @@ module.exports = {
     const [port] = args;
     const portNumber = Number.parseInt(port, 10) || DEFAULT_PORT;
 
+    const logger = getLogger({name: `api`});
+
     const app = express();
     app.use(express.json());
+
+    app.use(requestLogger);
     app.use(API_PREFIX, routes);
 
-
-    app.use((req, res) => res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Not Found`, details: `This endpoint is not presented`}}));
+    app.use(notFoundMiddleWare);
+    app.use(internalErrorMiddleWare);
 
     app.listen(portNumber, (err) => {
       if (err) {
-        console.log(chalk.red(`Ошибка при создании сервера: ${portNumber}`));
-        return;
+        logger.error(`Ошибка при создании сервера: ${portNumber}: ${err.message}`);
+        process.exit(ExitCodes.FAIL);
       }
 
-      console.log(chalk.green(`Сервер поднят успешно на порту: ${portNumber}`));
+      logger.info(`Сервер поднят успешно на порту: ${portNumber}`);
     });
   }
 };
