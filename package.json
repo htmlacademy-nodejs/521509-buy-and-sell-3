@@ -4,8 +4,9 @@
   "description": "Куплю. Продам",
   "main": "./src/service/service.js",
   "scripts": {
-    "start": "cross-env LOG_LEVEL=error node ./src/service/service.js",
-    "server": "nodemon ./src/service/service.js --server",
+    "start": "cross-env NODE_ENV=production node ./src/service/service.js --server",
+    "start::debug": "cross-env NODE_ENV=development node ./src/service/service.js --server",
+    "server": "LOG_LEVEL=debug  NODE_ENV=development nodemon ./src/service/service.js --server",
     "start-front-server": "nodemon ./src/express/index.js",
     "test": "npm run eslint && npm run jest",
     "test::rest": "jest --testPathPattern=./*.e2e.test.js",
