@@ -80,6 +80,14 @@ const Env = {
   TESTING: `testing`
 };
 
+const Methods = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  PATH: `PATH`,
+  DELETE: `DELETE`
+};
+
 module.exports = {
   DEFAULT_COMMAND,
   ExitCodes,
@@ -87,5 +95,6 @@ module.exports = {
   HttpCode,
   MAX_ID_LENGTH,
   API_PREFIX,
-  Env
+  Env,
+  Methods
 };
