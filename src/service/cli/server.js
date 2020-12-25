@@ -8,7 +8,7 @@
 
 const express = require(`express`);
 
-const routes = require(`../api-routes`);
+const {getAPIRouter} = require(`../api-routes`);
 const {getLogger} = require(`../lib/logger`);
 const {API_PREFIX, ExitCodes} = require(`../../consts`);
 
@@ -43,7 +43,7 @@ module.exports = {
     app.use(express.json());
 
     app.use(requestLogger);
-    app.use(API_PREFIX, routes);
+    app.use(API_PREFIX, await getAPIRouter());
 
     app.use(notFoundMiddleWare);
     app.use(internalErrorMiddleWare);
