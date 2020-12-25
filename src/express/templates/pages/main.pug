@@ -20,7 +20,7 @@ block content
                 .ticket-card__info
                   +getTicketLabel(offer.type)
                   .ticket-card__categories
-                    a(href='#') #{offer.category}
+                    a(href='#') #{offer.category.join(`, `)}
                   .ticket-card__header
                     h3.ticket-card__title
                       a(href='#') #{offer.title}
