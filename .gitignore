@@ -16,3 +16,5 @@ build/
 
 # Временные файлы
 mocks.json
+
+src/express/upload/**/*
