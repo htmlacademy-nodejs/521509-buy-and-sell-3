@@ -20,6 +20,15 @@ mainRoutes.get(`/`, async (req, res) => {
 });
 mainRoutes.get(`/register`, (req, res) => res.render(`pages/register`));
 mainRoutes.get(`/login`, (req, res) => res.render(`pages/login`));
-mainRoutes.get(`/search`, (req, res) => res.render(`pages/search`));
+mainRoutes.get(`/search`, async (req, res) => {
+  const searchText = req.query.query;
+  let result;
+  try {
+    result = await api.search(searchText);
+  } catch (err) {
+    result = [];
+  }
+  res.render(`pages/search`, {result});
+});
 
 module.exports = mainRoutes;
