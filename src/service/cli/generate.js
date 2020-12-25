@@ -160,7 +160,7 @@ const generateOffer = (categories, offerTitles, saleTitles, sentences, commentsS
     type,
     id: nanoid(MAX_ID_LENGTH),
     title: (type === OfferType.OFFER) ? getRandomItemInArray(offerTitles) : getRandomItemInArray(saleTitles),
-    picture: `item${getRandomNumber(1, 16)}.jpg`,
+    picture: `item${(`0` + getRandomNumber(1, 16)).slice(-2)}.jpg`,
     description: getRandomItemsInArray(sentences).join(` `),
     sum: getRandomNumber(SumRestrict.MIN, SumRestrict.MAX),
     category: getRandomItemsInArray(categories),
