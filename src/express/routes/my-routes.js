@@ -8,9 +8,18 @@
 
 const {Router} = require(`express`);
 
-const myRoutes = new Router();
+const API = require(`../api`);
 
-myRoutes.get(`/`, (req, res) => res.render(`pages/my/my-tickets`));
-myRoutes.get(`/comments`, (req, res) => res.render(`pages/my/comments`));
+const myRoutes = new Router();
+const api = API.getDefaultAPI();
+
+myRoutes.get(`/`, async (req, res) => {
+  const allOffers = await api.getOffers();
+  res.render(`pages/my/my-tickets`, {allOffers});
+});
+myRoutes.get(`/comments`, async (req, res) => {
+  const allOffers = await api.getOffers();
+  res.render(`pages/my/comments`, {allOffers: allOffers.slice(0, 3)});
+});
 
 module.exports = myRoutes;

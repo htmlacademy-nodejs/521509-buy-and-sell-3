@@ -7,12 +7,27 @@
  */
 
 const {Router} = require(`express`);
+const API = require(`../api`);
 
 const mainRoutes = new Router();
+const api = API.getDefaultAPI();
 
-mainRoutes.get(`/`, (req, res) => res.render(`pages/main`));
+
+mainRoutes.get(`/`, async (req, res) => {
+  const allOffers = await api.getOffers();
+  res.render(`pages/main`, {allOffers});
+});
 mainRoutes.get(`/register`, (req, res) => res.render(`pages/register`));
 mainRoutes.get(`/login`, (req, res) => res.render(`pages/login`));
-mainRoutes.get(`/search`, (req, res) => res.render(`pages/search`));
+mainRoutes.get(`/search`, async (req, res) => {
+  const searchText = req.query.query;
+  let result;
+  try {
+    result = await api.search(searchText);
+  } catch (err) {
+    result = [];
+  }
+  res.render(`pages/search`, {result});
+});
 
 module.exports = mainRoutes;

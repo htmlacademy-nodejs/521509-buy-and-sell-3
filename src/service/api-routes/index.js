@@ -21,15 +21,16 @@ const searchRouter = require(`./search`);
 const {getMockData} = require(`../lib/get-mock-data`);
 
 
-const app = new Router();
+const getAPIRouter = async () => {
+  const app = new Router();
 
-(async () => {
   const mockData = await getMockData();
 
   app.use(`/category`, categoryRouter(new CategoryService(mockData)));
   app.use(`/offers`, offerRouter(new OfferService(mockData), new CommentService()));
   app.use(`/search`, searchRouter(new SearchService(mockData)));
-})();
+  return app;
+};
 
 
-module.exports = app;
+module.exports = {getAPIRouter};

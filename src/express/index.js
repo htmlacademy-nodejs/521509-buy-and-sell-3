@@ -33,6 +33,15 @@ const PORT_NUMBER = 8080;
 const PATH_TO_PUBLIC_DIR = `public`;
 
 /**
+ * Путь до папки для приема файлов от пользователей. Она будет будет полностью доступна с помощью express.static.
+ *
+ * @const
+ * @type {string}
+ * @default
+ */
+const PATH_TO_UPLOAD_DIR = `../../upload`;
+
+/**
  * Путь до папки с шаблономи.
  *
  * @const
@@ -64,14 +73,16 @@ app.use(`/offers`, offersRoutes);
  * Добавляем отдачу статичных файлов.
  */
 app.use(express.static(path.resolve(__dirname, PATH_TO_PUBLIC_DIR)));
-
+app.use(express.static(path.resolve(__dirname, PATH_TO_UPLOAD_DIR)));
 
 /**
  * Добавляем обработчики ошибок.
  */
 app.use((req, res) => res.status(404).render(`errors/404`));
-// Для обработки ошибок нужно передать 4 аргумента, но eslint ругается на next, который не используется.
-app.use((err, req, res, next) => res.status(500).render(`errors/500`)); // eslint-disable-line
+app.use((err, req, res, _next) => {
+  console.log(err); // TODO переделать на pino
+  res.status(500).render(`errors/500`);
+});
 
 /**
  * Запускаем сервер
