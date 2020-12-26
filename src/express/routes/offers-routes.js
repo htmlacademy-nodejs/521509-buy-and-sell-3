@@ -12,7 +12,7 @@ const {Router} = require(`express`);
 const {nanoid} = require(`nanoid`);
 const multer = require(`multer`);
 
-const UPLOAD_DIR = `../upload/img/`;
+const UPLOAD_DIR = `../../../upload/img/`;
 
 const uploadDirAbsolute = path.resolve(__dirname, UPLOAD_DIR);
 
@@ -54,8 +54,8 @@ offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
 
 offersRoutes.get(`/:id`, (req, res) => res.render(`pages/offers/ticket`));
 offersRoutes.get(`/edit/:id`, async (req, res) => {
-  const [advert, categories] = await Promise.all([api.getOffer(req.params.id), api.getCategories()]);
-  res.render(`pages/offers/ticket-edit`, {advert, categories});
+  const [oneOffer, categories] = await Promise.all([api.getOffer(req.params.id), api.getCategories()]);
+  res.render(`pages/offers/ticket-edit`, {oneOffer, categories});
 });
 
 offersRoutes.get(`/category/:id`, (req, res) => res.render(`pages/offers/category`));

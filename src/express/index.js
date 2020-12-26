@@ -39,7 +39,7 @@ const PATH_TO_PUBLIC_DIR = `public`;
  * @type {string}
  * @default
  */
-const PATH_TO_UPLOAD_DIR = `upload`;
+const PATH_TO_UPLOAD_DIR = `../../upload`;
 
 /**
  * Путь до папки с шаблономи.
