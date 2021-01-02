@@ -8,13 +8,13 @@ DROP TABLE IF EXISTS categories;
 CREATE TABLE offers_types
 (
   id SERIAL PRIMARY KEY,
-  title VARCHAR(50) NOT NULL
+  title VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE categories
 (
   id SERIAL PRIMARY KEY,
-  title VARCHAR(50) NOT NULL
+  title VARCHAR(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE users
@@ -23,7 +23,7 @@ CREATE TABLE users
   avatar_url VARCHAR(254),
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
-  email VARCHAR(254) NOT NULL
+  email VARCHAR(254) NOT NULL UNIQUE
 );
 
 CREATE TABLE offers
