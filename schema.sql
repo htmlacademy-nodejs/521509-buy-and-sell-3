@@ -1,9 +1,9 @@
+DROP TABLE IF EXISTS offers_categories;
+DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS offers;
+DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS offers_types;
 DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS offers;
-DROP TABLE IF EXISTS comments;
-DROP TABLE IF EXISTS offers_categories;
 
 CREATE TABLE offers_types
 (
