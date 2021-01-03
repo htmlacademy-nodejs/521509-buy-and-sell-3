@@ -47,18 +47,22 @@ const shuffleArray = (array) => {
 };
 
 /**
- * getRandomItemsInArray - возвращает массив со несколькими случайными элементами массива, случайной длины
+ * getRandomItemsInArray - возвращает массив со несколькими случайными элементами массива, по умолчанию случайной длины
  *
  * @param {Array} array - исходный массив
+ * @param {Number} count - кол-во элементов в новом массиве
  * @return {Array} - массив со случайными элементами случайной длины
  */
-const getRandomItemsInArray = (array) => {
-  return shuffleArray(array).slice(0, getRandomNumber(1, array.length - 1));
+const getRandomItemsInArray = (array, count = null) => {
+  if (!count) {
+    count = getRandomNumber(1, array.length - 1);
+  }
+  return shuffleArray(array).slice(0, count);
 };
 
 
 /**
- * writeFile записывает данные в файл, и в случае ошибки завершает программу.
+ * writeFileInJSON записывает данные в файл в формате JSON
  *
  * @async
  * @param {string} filePath - путь до файла включая название файла
@@ -72,6 +76,22 @@ const getRandomItemsInArray = (array) => {
 const writeFileInJSON = async (filePath, data) => {
   const content = JSON.stringify(data, null, 2);
   await fs.writeFile(filePath, content);
+};
+
+/**
+ * writeFileInString записывает данные в файл.
+ *
+ * @async
+ * @param {string} filePath - путь до файла включая название файла
+ * @param {object} data - объект, который должен быть записан в файл.
+ *
+ * @example
+ * const {writeFile} = require('./utils);
+ * await writeFile('test.txt', 'This is test string');
+ */
+
+const writeFile = async (filePath, data) => {
+  await fs.writeFile(filePath, data);
 };
 
 /**
@@ -98,11 +118,23 @@ const readFileInJSON = async (filePath, encoding = `utf8`) => {
   return JSON.parse(data);
 };
 
+/**
+ * Возвращает случайную Date в прошлом
+ *
+ * @param {Number} max - максимальный интервал в прошлом в миллисекундах
+ * @return {Date} - случайная Date
+ */
+const getRandomDateInPast = (max) => {
+  return new Date(Date.now() - getRandomNumber(0, max));
+};
+
 module.exports = {
   getRandomNumber,
   getRandomItemInArray,
   getRandomItemsInArray,
   writeFileInJSON,
+  writeFile,
   readFileToArray,
-  readFileInJSON
+  readFileInJSON,
+  getRandomDateInPast
 };
