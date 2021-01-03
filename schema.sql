@@ -30,12 +30,16 @@ CREATE TABLE offers
 (
   id SERIAL PRIMARY KEY,
   type_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
   title VARCHAR(100) NOT NULL,
   description VARCHAR(1000) NOT NULL,
   creation_date TIMESTAMPTZ NOT NULL,
   image_url VARCHAR(254),
   cost FLOAT4 NOT NULL,
   FOREIGN KEY (type_id) REFERENCES offers_types(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
 );
