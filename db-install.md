@@ -23,3 +23,9 @@ GRANT ALL PRIVILEGES ON DATABASE "buy_and_sell" TO "buy_and_sell_user";
 \q
 psql -U buy_and_sell_user -W -h localhost -d buy_and_sell  -a -f schema.sql
 ```
+
+Генерируем объявления и наполняем базу
+```
+node src/service/service.js --fill 1000
+psql -U buy_and_sell_user -W -h localhost -d buy_and_sell  -a -f fill-db.sql
+```

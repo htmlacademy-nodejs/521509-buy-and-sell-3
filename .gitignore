@@ -16,5 +16,6 @@ build/
 
 # Временные файлы
 mocks.json
+fill-db.sql
 
 upload/
