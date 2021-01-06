@@ -30,7 +30,7 @@ SELECT
     ON offers.type_id = offers_types.id
   INNER JOIN users
     ON offers.user_id = users.id
-  INNER JOIN comments
+  LEFT JOIN comments
     ON comments.offer_id = offers.id
   INNER JOIN
     (
@@ -64,7 +64,7 @@ SELECT
     ON offers.type_id = offers_types.id
   INNER JOIN users
     ON offers.user_id = users.id
-  INNER JOIN comments
+  LEFT JOIN comments
     ON comments.offer_id = offers.id
   INNER JOIN
     (
