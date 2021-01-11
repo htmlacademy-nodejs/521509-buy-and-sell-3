@@ -16,6 +16,7 @@ const requestLogger = require(`../middlewares/req-logger`);
 const notFoundMiddleWare = require(`../middlewares/resource-not-found`);
 const internalErrorMiddleWare = require(`../middlewares/intenal-server-error`);
 
+const db = require(`../lib/sequelize`);
 /**
  * Порт по умолчанию
  * @const
@@ -38,6 +39,15 @@ module.exports = {
     const portNumber = Number.parseInt(port, 10) || DEFAULT_PORT;
 
     const logger = getLogger({name: `api`});
+
+    try {
+      logger.info(`Подключаемся к базе данных...`);
+      await db.authenticate();
+      logger.info(`Соединение с базой данных успешно установлено.`);
+    } catch (error) {
+      logger.error(`Не удалось подключиться к базе данных: ${error}`);
+      process.exit(ExitCodes.FAIL);
+    }
 
     const app = express();
     app.use(express.json());
