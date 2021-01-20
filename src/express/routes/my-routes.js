@@ -18,7 +18,7 @@ myRoutes.get(`/`, async (req, res) => {
   res.render(`pages/my/my-tickets`, {allOffers});
 });
 myRoutes.get(`/comments`, async (req, res) => {
-  const allOffers = await api.getOffers();
+  const allOffers = await api.getOffers({isWithComments: true});
   res.render(`pages/my/comments`, {allOffers: allOffers.slice(0, 3)});
 });
 

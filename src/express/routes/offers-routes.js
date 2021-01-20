@@ -32,17 +32,21 @@ const offersRoutes = new Router();
 
 const api = API.getDefaultAPI();
 
-offersRoutes.get(`/add`, (req, res) => res.render(`pages/offers/new-ticket`));
+offersRoutes.get(`/add`, async (req, res) => {
+  const categories = await api.getCategories();
+  const offerTypes = await api.getOfferTypes();
+  res.render(`pages/offers/new-ticket`, {categories, allOfferTypes: offerTypes});
+});
 
 offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
   const {body, file} = req;
   const offerData = {
-    picture: file.filename,
-    sum: body.price,
-    type: body.action,
-    description: body.comment,
-    title: body[`ticket-name`],
-    category: [body.category]
+    'image_url': file.filename,
+    'cost': body.price,
+    'type_id': body.action,
+    'description': body.comment,
+    'title': body[`ticket-name`],
+    'categories': body.categories
   };
   try {
     await api.createOffer(offerData);
@@ -52,10 +56,13 @@ offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
   }
 });
 
-offersRoutes.get(`/:id`, (req, res) => res.render(`pages/offers/ticket`));
+offersRoutes.get(`/:id`, async (req, res) => {
+  const oneOffer = await api.getOffer(req.params.id);
+  res.render(`pages/offers/ticket`, {oneOffer});
+});
 offersRoutes.get(`/edit/:id`, async (req, res) => {
-  const [oneOffer, categories] = await Promise.all([api.getOffer(req.params.id), api.getCategories()]);
-  res.render(`pages/offers/ticket-edit`, {oneOffer, categories});
+  const [oneOffer, categories, offerTypes] = await Promise.all([api.getOffer(req.params.id), api.getCategories(), api.getOfferTypes()]);
+  res.render(`pages/offers/ticket-edit`, {oneOffer, categories, allOfferTypes: offerTypes});
 });
 
 offersRoutes.get(`/category/:id`, (req, res) => res.render(`pages/offers/category`));
