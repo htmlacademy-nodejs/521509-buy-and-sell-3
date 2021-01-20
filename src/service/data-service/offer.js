@@ -1,86 +1,93 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-
-const {MAX_ID_LENGTH} = require(`../../consts`);
+const Aliase = require(`../models/aliase`);
 
 /**
  * Сервис для работы с объявлениями
  */
 class OfferService {
   /**
-   * @param {Object[]} offers - массив объявлений
+   * @param {Sequelize} sequelize - экземпляр sequelize
    */
-  constructor(offers) {
-    this._offers = offers;
-  }
-
-  /**
-   * Приватный метод поиска индекса по объявлениям. Вызывает ошибку, если индекс не найден.
-   *
-   * @param {String} id - id искомого объявления
-   * @return {number} - возвращает индекс найденного объявления.
-   * @private
-   */
-  _findIndexById(id) {
-    const index = this._offers.findIndex((it) => it.id === id);
-
-    if (index < 0) {
-      throw new Error(`Not Found offer with ID ${id}`);
-    }
-
-    return index;
+  constructor(sequelize) {
+    this._offerModel = sequelize.models.Offer;
+    this._commentModel = sequelize.models.Comment;
+    this._categoryModel = sequelize.models.Category;
   }
 
   /**
    * Добавление нового объявления с добавлением к нему id и пустого массива с комментариями.
    *
-   * @param {Object} offer - объявление
-   * @return {Object} - возвращает созданное объявление
+   * @async
+   * @param {Object} offerData - объявление
+   * @return {Promise}
    */
-  add(offer) {
-    const newOffer = {...offer, id: nanoid(MAX_ID_LENGTH), comments: []};
-
-    this._offers.push(newOffer);
-
-    return newOffer;
+  async add(offerData) {
+    const offer = await this._offerModel.create(offerData);
+    await offer.addCategories(offerData.categories);
+    return offer.get();
   }
 
   /**
-   * Удаоение объявления по id
+   * Удаление объявления по id
+   * @async
    * @param {String} id - id объявления
+   * @return {Boolean} - возвращает true - если что-то удалил
    */
-  delete(id) {
-    this._offers.splice(this._findIndexById(id), 1);
+  async delete(id) {
+    const deletedRows = await this._offerModel.destroy({
+      where: {
+        id
+      }
+    });
+
+    return !!deletedRows;
   }
 
   /**
-   * Отдача все объявлений, которые есть.
+   * Отдача всех объявлений, которые есть.
+   * @async
+   * @param {Boolean} isWithComments - нужны ли комментарии
    * @return {Object[]}
    */
-  getAll() {
-    return this._offers;
+  async getAll(isWithComments) {
+    const include = [Aliase.CATEGORIES, Aliase.OFFERS_TYPES];
+    if (isWithComments) {
+      include.push(Aliase.COMMENTS);
+    }
+    const offers = await this._offerModel.findAll({include});
+    return offers.map((item) => item.get());
   }
 
   /**
    * Отдает объявление по Id
-   * @param {String} id - id объявления
+   * @async
+   * @param {Number} id - id объявления
    * @return {Object} - найденное объявление
    */
-  getOne(id) {
-    return this._offers[this._findIndexById(id)];
+  async getOne(id) {
+    const offer = await this._offerModel.findByPk(id, {
+      include: [Aliase.CATEGORIES, Aliase.COMMENTS, Aliase.OFFERS_TYPES]
+    });
+    return offer.get();
   }
 
   /**
    * Обновление объявления по id
+   * @async
    * @param {String} id - id объявления
    * @param {Object} offer - новое объявление
    * @return {Object} - получившиеся объявление
    */
-  update(id, offer) {
-    const index = this._findIndexById(id);
-    this._offers[index] = {...this._offers[index], ...offer};
-    return this._offers[index];
+  async update(id, offer) {
+    const updatedOffer = await this._offerModel.update(offer, {
+      where: {id},
+      returning: true,
+      plain: true
+    });
+
+    // Это только в постгресе работает.
+    return updatedOffer[1].get();
   }
 }
 

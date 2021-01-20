@@ -1,72 +1,67 @@
 'use strict';
 
-const {nanoid} = require(`nanoid`);
-
-const {MAX_ID_LENGTH} = require(`../../consts`);
-
 /**
  * Сервис для работы с комментариями к объявлению
  */
 class CommentService {
   /**
-   * Приватный метод поиска индекса по комментариям. Вызывает ошибку, если индекс не найден.
-   *
-   * @param {Object} offer - объявление
-   * @param {String} commentId - id искомого комментария
-   * @return {number} - возвращает индекс найденного объявления.
-   * @private
+   * @param {Sequelize} sequelize - экземпляр sequelize
    */
-  _findIndexById(offer, commentId) {
-    const index = offer.comments.findIndex((it) => it.id === commentId);
-
-    if (index < 0) {
-      throw new Error(`Not found comment Id ${commentId} in offer Id ${offer.id}`);
-    }
-
-    return index;
+  constructor(sequelize) {
+    this._commentModel = sequelize.models.Comment;
   }
-
-
   /**
    * Добавление комментария к объявлению
-   * @param {Object} offer - объявление
+   * @async
+   * @param {Number} offerId - Id объявления
    * @param {Object} comment - добавляемый комментарий
    * @return {Object} - добавленный комментарий с id
    */
-  add(offer, comment) {
-    const newComment = {...comment, id: nanoid(MAX_ID_LENGTH)};
-
-    offer.comments.push(newComment);
-
-    return newComment;
+  async add(offerId, comment) {
+    return await this._commentModel.create({'offer_id': offerId, ...comment});
   }
 
   /**
    * Удаление комментария к объявлению
-   * @param {Object} offer - объявление
+   * @async
    * @param {String} commentId - id комментария
+   * @return {Boolean} - возвращает true если комментарий был удален.
    */
-  delete(offer, commentId) {
-    offer.comments.splice(this._findIndexById(offer, commentId), 1);
+  async delete(commentId) {
+    const deletedRows = await this._commentModel.destroy({where: {'id': commentId}});
+    return !!deletedRows;
   }
 
   /**
    * Возвращает все комментарии к объявлению
-   * @param {Object} offer - объявление
+   * @async
+   * @param {Object} offerId - ID объявления
    * @return {Object[]} - массив комментариев
    */
-  getAll(offer) {
-    return offer.comments;
+  async getAll(offerId) {
+    return await this._commentModel.findAll({
+      where:
+          {
+            'offer_id': offerId
+          },
+      raw: true
+    });
   }
 
   /**
    * Возвращает комментарий к объявлению по id
-   * @param {Object} offer - объявление
+   * @async
    * @param {String} commentId - id комментария
-   * @return {Object[]} - массив комментариев
+   * @return {Object} - комментарий
    */
-  getOne(offer, commentId) {
-    return offer.comments[this._findIndexById(offer, commentId)];
+  async getOne(commentId) {
+    return await this._commentModel.findOne({
+      where:
+        {
+          'id': commentId
+        },
+      raw: true
+    });
   }
 }
 
