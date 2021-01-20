@@ -4,25 +4,26 @@
  * Этот модуль генерирует данные для наполнения базы данных.
  * Если не было указано количество объявлений - то количество статей генерируется по умолчанию.
  *
- * Запросы SQL сохраняются в указанный файл в корневой директории в указанной константе FILE_NAME.
+ * База наполняется через sequelize
  *
- *  @module src/service/cli/fill
+ *  @module src/service/cli/filldb
  */
 
 const path = require(`path`);
 
-const chalk = require(`chalk`);
+const {getLogger} = require(`../lib/logger`);
 
 const {
   getRandomNumber,
   getRandomItemInArray,
   getRandomItemsInArray,
   readFileToArray,
-  getRandomDateInPast,
-  writeFile
+  getRandomDateInPast
 } = require(`../../utils`);
 const {ExitCodes} = require(`../../consts`);
 
+const {getSequelize} = require(`../lib/sequelize`);
+const defineModels = require(`../models`);
 
 /**
  * Число объявлений по умолчанию
@@ -67,16 +68,6 @@ const MAX_PAST = 3 * 30 * 24 * 60 * 60 * 1000;
  * @default 5
  */
 const MAX_COMMENTS_COUNT = 5;
-
-
-/**
- * Название файла для записи результата
- * @const
- * @type {string}
- * @default
- */
-const FILE_NAME = `fill-db.sql`;
-
 
 /**
  * Относительный путь к корневому каталогу
@@ -155,7 +146,7 @@ const PATH_TO_EMAILS = `data/user-emails.txt`;
  *
  * @type {{SALE: string, OFFER: string}}
  */
-const OfferType = {
+const OfferTypes = {
   OFFER: `offer`,
   SALE: `sale`,
 };
@@ -171,19 +162,8 @@ const SumRestrict = {
   MAX: 100000,
 };
 
-
-/**
- * Возвращает строку с SQL запросом для добавления типов объявлений
- *
- * @return {string}
- */
-const fillOfferTypes = () => {
-  return (
-    `INSERT INTO offers_types (id, title)
-     VALUES
-      (1, '${OfferType.OFFER}'),
-      (2, '${OfferType.SALE}');`
-  );
+const generateOfferTypes = () => {
+  return [{_id: 1, title: OfferTypes.OFFER}, {_id: 2, title: OfferTypes.SALE}];
 };
 
 
@@ -196,28 +176,11 @@ const fillOfferTypes = () => {
 const generateCategories = (categoriesTitles) => {
   return categoriesTitles.map((it, index) => {
     return {
-      id: index + 1,
+      _id: index + 1,
       title: it
     };
   });
 };
-
-
-/**
- * Возвращает строку с SQL запросом для добавления категорий
- *
- * @param {Object[]} categories - объекты категорий
- * @return {string}
- */
-const fillCategories = (categories) => {
-  const values = categories.map((it) => `(${it.id}, '${it.title}')`).join(`, \n`);
-  return (
-    `INSERT INTO categories (id, title)
-      VALUES
-        ${values};`
-  );
-};
-
 
 /**
  * Генерирует пользователей
@@ -232,29 +195,13 @@ const generateUsers = (count, firstNames, lastNames, emails) => {
   const randomEmails = getRandomItemsInArray(emails, count);
   return Array(count).fill({}).map((it, index) => {
     return {
-      'id': index + 1,
-      'firstname': getRandomItemInArray(firstNames),
-      'lastname': getRandomItemInArray(lastNames),
+      '_id': index + 1,
+      'first_name': getRandomItemInArray(firstNames),
+      'last_name': getRandomItemInArray(lastNames),
       'email': randomEmails[index],
       'avatar_url': `avatar${(`0` + getRandomNumber(1, 4)).slice(-2)}.jpg`
     };
   });
-};
-
-
-/**
- *  Возвращает строку с SQL запросом для добавления пользователей
- *
- * @param {{firstname: String, avatar_url: string, id: Number, email: String, lastname: String}[]} users - массив пользователей
- * @return {string}
- */
-const fillUsers = (users) => {
-  const values = users.map((it) => `(${it.id}, '${it[`avatar_url`]}', '${it.firstname}', '${it.lastname}', '${it.email}')`).join(`, \n`);
-  return (
-    `INSERT INTO users (id, avatar_url, first_name, last_name, email)
-      VALUES
-        ${values};`
-  );
 };
 
 
@@ -273,29 +220,14 @@ const generateComments = (offers, users, commentsSentences) => {
       return {
         'text': getRandomItemsInArray(commentsSentences).join(``),
         'creation_date': getRandomDateInPast(MAX_PAST),
-        'offer_id': offer.id,
-        'user_id': getRandomItemInArray(users).id
+        'offer_id': offer._id,
+        // 'user_id': getRandomItemInArray(users).id
       };
     }));
   });
   return result;
 };
 
-
-/**
- * Возвращает строку с SQL запросом для добавления комментариев
- *
- * @param {Object[]} comments - комментарии
- * @return {string}
- */
-const fillComments = (comments) => {
-  const values = comments.map((it) => `('${it.text}', '${it[`creation_date`].toISOString()}', ${it[`offer_id`]}, ${it[`user_id`]})`).join(`, \n`);
-  return (
-    `INSERT INTO comments (text, creation_date, offer_id, user_id)
-      VALUES
-        ${values};`
-  );
-};
 
 /**
  * Генерация объявлений
@@ -309,9 +241,9 @@ const fillComments = (comments) => {
 const generateOffers = (count, saleTitles, sentences, users) => {
   return Array(count).fill({}).map((it, index) => {
     return {
-      'id': index + 1,
+      '_id': index + 1,
       'type_id': getRandomNumber(1, 2),
-      'user_id': getRandomItemInArray(users).id,
+      // 'user_id': getRandomItemInArray(users).id,
       'title': getRandomItemInArray(saleTitles),
       'description': getRandomItemsInArray(sentences).join(` `),
       'creation_date': getRandomDateInPast(MAX_PAST),
@@ -320,23 +252,6 @@ const generateOffers = (count, saleTitles, sentences, users) => {
     };
   });
 };
-
-
-/**
- * Возвращает строку с SQL запросом для добавления объявлений
- *
- * @param {Object[]} offers - объявления
- * @return {string}
- */
-const fillOffers = (offers) => {
-  const values = offers.map((it) => `(${it.id}, ${it[`type_id`]}, ${it[`user_id`]}, '${it.title}', '${it.description}', '${it[`creation_date`].toISOString()}', '${it[`image_url`]}', ${it.cost})`).join(`, \n`);
-  return (
-    `INSERT INTO offers (id, type_id, user_id, title, description, creation_date, image_url, cost)
-      VALUES
-        ${values};`
-  );
-};
-
 
 /**
  * Для каждого объявления генерируем рандомное количество категорий
@@ -350,62 +265,11 @@ const generateOffersCategories = (offers, categories) => {
   offers.forEach((offer) => {
     const randomCategories = getRandomItemsInArray(categories);
     randomCategories.forEach((category) => result.push({
-      'offer_id': offer.id,
-      'category_id': category.id
+      'offer_id': offer._id,
+      'category_id': category._id
     }));
   });
   return result;
-};
-
-
-/**
- * Возвращает строку с SQL запросом для добавления связей объявлений и категорий
- *
- * @param {Object[]} offersCategories
- * @return {string}
- */
-const fillOffersCategories = (offersCategories) => {
-  const values = offersCategories.map((it) => `(${it[`offer_id`]}, ${it[`category_id`]})`).join(`, \n`);
-  return (
-    `INSERT INTO offers_categories (offer_id, category_id)
-      VALUES
-        ${values};`
-  );
-};
-
-
-/**
- * Генерация итогового SQL запроса
- *
- * @param {Object[]} categories - категории
- * @param {Object[]} users - пользователи
- * @param {Object[]} offers - объявления
- * @param {Object[]} comments - комментарии
- * @param {Object[]} offersCategories - связи объявлений и категорий
- * @return {string} - SQL запрос
- */
-const generateFullSql = (categories, users, offers, comments, offersCategories) => {
-  return (
-    `TRUNCATE offers_categories, comments, offers, users, offers_types, categories;
-
-  -- Добавляем типы объявлений
-  ${fillOfferTypes()}
-
-  -- Добавляем категории
-  ${fillCategories(categories)}
-
-  -- Добавляем пользователей
-  ${fillUsers(users)}
-
-  -- Добавляем объявления
-  ${fillOffers(offers)}
-
-  -- Добавляем комментарии
-  ${fillComments(comments)}
-
-  -- добавляем связи категории - объявления
-  ${fillOffersCategories(offersCategories)}`
-  );
 };
 
 /**
@@ -425,7 +289,7 @@ const readDataForGeneration = async (filePath) => {
 };
 
 module.exports = {
-  name: `--fill`,
+  name: `--filldb`,
 
   /**
    * Метод run запускает генерацию объявлений и записывает их в указанный файл
@@ -434,13 +298,26 @@ module.exports = {
    */
 
   async run(args) {
+    const logger = getLogger({name: `fill-db`});
+
     const [count] = args;
     const countNumber = Number.parseInt(count, 10) || DEFAULT_OFFERS_COUNT;
     if (countNumber > MAX_COUNT) {
-      console.error(chalk.red(
+      logger.error(
           `Указано число объявлений больше ${MAX_COUNT}. \nУкажи не больше ${MAX_COUNT} объявлений`
-      ));
+      );
       return;
+    }
+
+    const sequelize = getSequelize();
+
+    try {
+      logger.info(`Подключаемся к базе данных...`);
+      await sequelize.authenticate();
+      logger.info(`Соединение с базой данных успешно установлено.`);
+    } catch (error) {
+      logger.error(`Ошибка: ${error}`);
+      process.exit(ExitCodes.FAIL);
     }
 
     let categoriesTitles; let saleTitles; let sentences; let commentsSentences;
@@ -456,18 +333,48 @@ module.exports = {
         readDataForGeneration(PATH_TO_LASTNAMES),
         readDataForGeneration(PATH_TO_EMAILS)
       ]);
-      const absoluteFilePath = path.join(__dirname, PATH_TO_ROOT_FOLDER, FILE_NAME);
 
+      const offerTypes = generateOfferTypes();
       const categories = generateCategories(categoriesTitles);
       const users = generateUsers(DEFAULT_USERS_COUNT, firstnames, lastnames, emails);
       const offers = generateOffers(countNumber, saleTitles, sentences, users);
       const comments = generateComments(offers, users, commentsSentences);
       const offersCategories = generateOffersCategories(offers, categories);
 
-      await writeFile(absoluteFilePath, generateFullSql(categories, users, offers, comments, offersCategories));
-      console.info(chalk.green(`Сгенерировано ${countNumber} объявлений и успешно записаны в файл ${FILE_NAME}.\nАбсолютный путь до файла: ${absoluteFilePath}`));
+      logger.info(`Создаём новые таблицы...`);
+      const {OfferType, Category, User, Offer, Comment, OfferCategory} = defineModels(sequelize);
+      await sequelize.sync({force: true});
+      logger.info(`Новые таблицы созданы.`);
+
+      logger.info(`Добавляем ${offerTypes.length} типов объявлений.`);
+      await OfferType.bulkCreate(offerTypes);
+      logger.info(`Типы объявлений добавлены.`);
+
+      logger.info(`Добавляем ${categories.length} категорий.`);
+      await Category.bulkCreate(categories);
+      logger.info(`Категории добавлены.`);
+
+      // Временно отключаем
+      // logger.info(`Добавляем ${users.length} пользователей.`);
+      // await User.bulkCreate(users);
+      // logger.info(`Пользователи добавлены.`);
+
+      logger.info(`Добавляем ${offers.length} объявлений.`);
+      await Offer.bulkCreate(offers);
+      logger.info(`Объявления добавлены.`);
+
+      logger.info(`Добавляем ${comments.length} комментарии.`);
+      await Comment.bulkCreate(comments);
+      logger.info(`Комментарии добавлены.`);
+
+      logger.info(`Добавляем ${offersCategories.length} связей объявления-категории.`);
+      await OfferCategory.bulkCreate(offersCategories);
+      logger.info(`Связи объявления-категории добавлены.`);
+
+      logger.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в базу данных`);
+      process.exit(ExitCodes.SUCCESS);
     } catch (error) {
-      console.error(chalk.red(`Ошибка: ${error.message}`));
+      logger.error(`Ошибка: ${error.message}`);
       process.exit(ExitCodes.FAIL);
     }
 

@@ -15,6 +15,7 @@ SELECT categories.id, categories.title, count(categories.id) FROM offers_categor
 -- Получить список объявлений (идентификатор объявления, заголовок объявления, стоимость, тип объявления, текст объявления, дата публикации, имя и фамилия автора, контактный email, количество комментариев, наименование категорий). Сначала свежие объявления;
 
 -- Спасибо наставнику за наводку на курс по SQL, создаем представление, чтобы не повторять этот код при необходимости выборки по id или иным полям.
+-- Пройдя тот же курс немного дальше, это решение ок. Но так как я сам не смог придумать нормальное название, то возможно лучше было использовать табличные выражения.
 DROP VIEW IF EXISTS offers_info;
 CREATE VIEW offers_info AS(
 SELECT
@@ -23,7 +24,7 @@ SELECT
   offers.cost AS "cost",
   offers_types.title AS "type",
   offers.description AS "text",
-  offers.creation_date AS "creation_date",
+  offers."createdAt" AS "created_at",
   users.first_name AS "user_first_name",
   users.last_name AS "user_last_name",
   users.email AS "user_email",
@@ -50,7 +51,7 @@ SELECT
       GROUP BY offers_categories.offer_id
     )
      offers_categories ON offers_categories.offer_id = offers.id
-  ORDER BY offers.creation_date DESC
+  ORDER BY offers."createdAt" DESC
     );
 -- выбираем наше новое представление
 SELECT * FROM offers_info;
@@ -69,7 +70,7 @@ SELECT
     FROM comments
   INNER JOIN users
     ON comments.user_id = users.id
-  ORDER BY comments.creation_date DESC
+  ORDER BY comments."createdAt" DESC
   LIMIT 5
     ;
 
