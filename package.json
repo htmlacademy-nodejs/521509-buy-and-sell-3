@@ -6,6 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node -r dotenv/config ./src/service/service.js --server",
     "start::debug": "cross-env NODE_ENV=development nodemon  -r dotenv/config ./src/service/service.js --server",
+    "filldb": "cross-env NODE_ENV=development LOG_LEVEL=debug node -r dotenv/config ./src/service/service.js --filldb",
     "start-front-server": "nodemon ./src/express/index.js",
     "test": "cross-env NODE_ENV=testing npm run eslint && npm run test::rest",
     "test::rest": "cross-env NODE_ENV=testing jest --testPathPattern=./*.e2e.test.js",
