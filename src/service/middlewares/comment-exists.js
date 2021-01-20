@@ -8,16 +8,15 @@
 const {getLogger} = require(`../lib/logger`);
 const {HttpCode} = require(`../../consts`);
 
-module.exports = (commentService) => (req, res, next) => {
+module.exports = (commentService) => async (req, res, next) => {
   const logger = getLogger({name: `api`});
 
-  const {offer} = res.locals;
   const commentId = req.params[`commentId`];
 
   logger.debug(`Проверяем, что комментарий ${commentId} существует.`);
 
   try {
-    res.locals.comment = commentService.getOne(offer, commentId);
+    res.locals.comment = await commentService.getOne(req.params[`offerId`], commentId);
     logger.debug(`Проверка прошла. Комментарий ${commentId} существует.`);
     next();
   } catch (err) {
