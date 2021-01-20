@@ -7,7 +7,7 @@
 const {getLogger} = require(`../lib/logger`);
 const {HttpCode} = require(`../../consts`);
 
-const REQUIRED_OFFER_KEYS = [`type`, `title`, `picture`, `description`, `sum`, `category`];
+const REQUIRED_OFFER_KEYS = [`type_id`, `title`, `image_url`, `description`, `cost`, `categories`];
 
 module.exports = (req, res, next) => {
   const logger = getLogger({name: `api`});

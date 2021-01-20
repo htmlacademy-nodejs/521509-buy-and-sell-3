@@ -8,7 +8,7 @@
 const {getLogger} = require(`../lib/logger`);
 const {HttpCode} = require(`../../consts`);
 
-module.exports = (service) => (req, res, next) => {
+module.exports = (service) => async (req, res, next) => {
   const logger = getLogger({name: `api`});
 
   const offerId = req.params[`offerId`];
@@ -16,7 +16,7 @@ module.exports = (service) => (req, res, next) => {
   logger.debug(`Проверяем, что объявление ${offerId} существует.`);
 
   try {
-    res.locals.offer = service.getOne(offerId);
+    res.locals.offer = await service.getOne(offerId);
     logger.debug(`Проверка прошла. Объявление ${offerId} существует.`);
     next();
   } catch (err) {
