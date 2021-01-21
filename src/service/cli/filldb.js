@@ -219,7 +219,7 @@ const generateComments = (offers, users, commentsSentences) => {
     result.push(...Array(MAX_COMMENTS_COUNT).fill({}).map(() => {
       return {
         'text': getRandomItemsInArray(commentsSentences).join(``),
-        'creation_date': getRandomDateInPast(MAX_PAST),
+        'created_at': getRandomDateInPast(MAX_PAST),
         'offer_id': offer._id,
         // 'user_id': getRandomItemInArray(users).id
       };
@@ -238,7 +238,7 @@ const generateComments = (offers, users, commentsSentences) => {
  * @param {Object[]} users - пользователи
  * @return {{cost: number, user_id: *, type_id: number, image_url: string, description: string, id, creation_date: Date, title: *}[]}
  */
-const generateOffers = (count, saleTitles, sentences, users) => {
+const generateOffers = (count, saleTitles, sentences /* ,users*/) => {
   return Array(count).fill({}).map((it, index) => {
     return {
       '_id': index + 1,
@@ -246,8 +246,8 @@ const generateOffers = (count, saleTitles, sentences, users) => {
       // 'user_id': getRandomItemInArray(users).id,
       'title': getRandomItemInArray(saleTitles),
       'description': getRandomItemsInArray(sentences).join(` `),
-      'creation_date': getRandomDateInPast(MAX_PAST),
-      'image_url': `item${(`0` + getRandomNumber(1, 16)).slice(-2)}.jpg`,
+      'created_at': getRandomDateInPast(MAX_PAST),
+      'imageUrl': `item${(`0` + getRandomNumber(1, 16)).slice(-2)}.jpg`,
       'cost': getRandomNumber(SumRestrict.MIN, SumRestrict.MAX),
     };
   });
@@ -342,7 +342,7 @@ module.exports = {
       const offersCategories = generateOffersCategories(offers, categories);
 
       logger.info(`Создаём новые таблицы...`);
-      const {OfferType, Category, User, Offer, Comment, OfferCategory} = defineModels(sequelize);
+      const {OfferType, Category, /* User, */Offer, Comment, OfferCategory} = defineModels(sequelize);
       await sequelize.sync({force: true});
       logger.info(`Новые таблицы созданы.`);
 
