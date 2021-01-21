@@ -33,7 +33,7 @@ const define = (sequelize) => {
    * один ко многим, так как у одного типа может несколько объявлений, а у одного объявления только один тип.
    */
   OfferType.hasMany(Offer, {as: Alias.OFFERS, foreignKey: `type_id`});
-  Offer.belongsTo(OfferType, {as: Alias.OFFERS_TYPES, foreignKey: `type_id`});
+  Offer.belongsTo(OfferType, {as: Alias.OFFER_TYPE, foreignKey: `type_id`});
 
   /**
    * Связь "категории - объявления".
@@ -52,7 +52,7 @@ const define = (sequelize) => {
     foreignKey: `offer_id`,
     otherKey: `category_id`
   });
-  Category.hasMany(OfferCategory, {as: Alias.OFFERS_CATEGORIES, foreignKey: `category_id`});
+  Category.hasMany(OfferCategory, {as: Alias.OFFER_CATEGORIES, foreignKey: `category_id`});
 
   /**
    * Связь пользователь - объявление

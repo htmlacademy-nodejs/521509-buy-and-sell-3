@@ -7,14 +7,14 @@ block content
         h1.visually-hidden Карточка объявления
         .ticket__content
           .ticket__img
-            img(src=`/img/${oneOffer[`image_url`]}` alt='Изображение товара')
+            img(src=`/img/${oneOffer.imageUrl}` alt='Изображение товара')
           .ticket__info
             h2.ticket__title #{oneOffer.title}
             .ticket__header
               p.ticket__price
                 span.js-sum #{oneOffer.cost}
                 |  ₽
-              p.ticket__action #{oneOffer.offers_types.title}
+              p.ticket__action #{oneOffer.offerType.title}
             .ticket__desc
               p
                 | #{oneOffer.description}

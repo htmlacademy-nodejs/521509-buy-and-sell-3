@@ -13,7 +13,12 @@ const define = (sequelize) => Comment.init({
 {
   sequelize,
   modelName: `Comment`,
-  tableName: `comments`
+  tableName: `comments`,
+  timestamps: true,
+  paranoid: true,
+  createdAt: `created_at`,
+  updatedAt: `updated_at`,
+  deletedAt: `deleted_at`
 }
 );
 

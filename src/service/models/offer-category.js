@@ -8,7 +8,12 @@ const define = (sequelize) => OfferCategory.init({},
     {
       sequelize,
       modelName: `OfferCategory`,
-      tableName: `offers_categories`
+      tableName: `offers_categories`,
+      timestamps: true,
+      paranoid: true,
+      createdAt: `created_at`,
+      updatedAt: `updated_at`,
+      deletedAt: `deleted_at`
     }
 );
 

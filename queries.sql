@@ -24,17 +24,17 @@ SELECT
   offers.cost AS "cost",
   offers_types.title AS "type",
   offers.description AS "text",
-  offers."createdAt" AS "created_at",
-  users.first_name AS "user_first_name",
-  users.last_name AS "user_last_name",
-  users.email AS "user_email",
+  offers.created_at AS "created_at",
+--  users.first_name AS "user_first_name",
+--  users.last_name AS "user_last_name",
+--  users.email AS "user_email",
   comments.comments_count AS "comments_count",
   offers_categories.categories_titles AS "categories"
     FROM offers
   INNER JOIN offers_types
     ON offers.type_id = offers_types.id
-  INNER JOIN users
-    ON offers.user_id = users.id
+--  INNER JOIN users
+--    ON offers.user_id = users.id
   LEFT JOIN (
     SELECT
       comments.offer_id,
@@ -51,7 +51,7 @@ SELECT
       GROUP BY offers_categories.offer_id
     )
      offers_categories ON offers_categories.offer_id = offers.id
-  ORDER BY offers."createdAt" DESC
+  ORDER BY offers.created_at DESC
     );
 -- выбираем наше новое представление
 SELECT * FROM offers_info;
@@ -70,7 +70,7 @@ SELECT
     FROM comments
   INNER JOIN users
     ON comments.user_id = users.id
-  ORDER BY comments."createdAt" DESC
+  ORDER BY comments.created_at DESC
   LIMIT 5
     ;
 

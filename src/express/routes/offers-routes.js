@@ -41,12 +41,12 @@ offersRoutes.get(`/add`, async (req, res) => {
 offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
   const {body, file} = req;
   const offerData = {
-    'image_url': file.filename,
-    'cost': body.price,
-    'type_id': body.action,
-    'description': body.comment,
-    'title': body[`ticket-name`],
-    'categories': body.categories
+    imageUrl: file.filename,
+    cost: body.price,
+    typeId: body.action,
+    description: body.comment,
+    title: body[`ticket-name`],
+    categories: body.categories
   };
   try {
     await api.createOffer(offerData);

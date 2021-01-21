@@ -24,6 +24,7 @@ class OfferService {
    */
   async add(offerData) {
     const offer = await this._offerModel.create(offerData);
+    await offer.setOfferType(offerData.typeId);
     await offer.addCategories(offerData.categories);
     return offer.get();
   }
@@ -51,7 +52,7 @@ class OfferService {
    * @return {Object[]}
    */
   async getAll(isWithComments) {
-    const include = [Aliase.CATEGORIES, Aliase.OFFERS_TYPES];
+    const include = [Aliase.CATEGORIES, Aliase.OFFER_TYPE];
     if (isWithComments) {
       include.push(Aliase.COMMENTS);
     }
@@ -67,7 +68,7 @@ class OfferService {
    */
   async getOne(id) {
     const offer = await this._offerModel.findByPk(id, {
-      include: [Aliase.CATEGORIES, Aliase.COMMENTS, Aliase.OFFERS_TYPES]
+      include: [Aliase.CATEGORIES, Aliase.COMMENTS, Aliase.OFFER_TYPE]
     });
     return offer.get();
   }

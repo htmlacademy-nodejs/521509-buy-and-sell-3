@@ -3,8 +3,8 @@
 module.exports = {
   COMMENTS: `comments`,
   OFFERS: `offers`,
-  OFFERS_TYPES: `offers_types`,
+  OFFER_TYPE: `offerType`,
   CATEGORIES: `categories`,
-  OFFERS_CATEGORIES: `offerCategories`,
+  OFFER_CATEGORIES: `offerCategories`,
   USERS: `users`
 };

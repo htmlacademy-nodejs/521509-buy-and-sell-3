@@ -21,5 +21,5 @@ GRANT ALL PRIVILEGES ON DATABASE "buy_and_sell" TO "buy_and_sell_user";
 
 Указываем параметры для подключения в файл .env и наполняем базу тестовыми данными. Если тестовые данные не нужны, то просто запускаем.
 ```
-nmp run filldb
+npm run filldb
 ```

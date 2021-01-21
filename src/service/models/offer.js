@@ -5,18 +5,19 @@ const {DataTypes, Model} = require(`sequelize`);
 class Offer extends Model {}
 
 const define = (sequelize) => Offer.init({
-  'title': {
+  title: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  'description': {
+  description: {
     type: DataTypes.STRING(1000),// eslint-disable-line
     allowNull: false
   },
-  'image_url': {
-    type: DataTypes.STRING
+  imageUrl: {
+    type: DataTypes.STRING,
+    field: `image_url`
   },
-  'cost': {
+  cost: {
     type: DataTypes.STRING,
     allowNull: false
   }
@@ -24,7 +25,12 @@ const define = (sequelize) => Offer.init({
 {
   sequelize,
   modelName: `Offer`,
-  tableName: `offers`
+  tableName: `offers`,
+  timestamps: true,
+  paranoid: true,
+  createdAt: `created_at`,
+  updatedAt: `updated_at`,
+  deletedAt: `deleted_at`
 }
 );
 

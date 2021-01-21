@@ -29,7 +29,7 @@ class SearchService {
           [Op.iLike]: `%${searchText}%`
         }
       },
-      include: [Alias.CATEGORIES, Alias.OFFERS_TYPES]
+      include: [Alias.CATEGORIES, Alias.OFFER_TYPE]
     });
     return offers.map((offer) => offer.get());
   }

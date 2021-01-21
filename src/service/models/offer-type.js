@@ -14,7 +14,12 @@ const define = (sequelize) => OfferType.init({
 {
   sequelize,
   modelName: `OfferType`,
-  tableName: `offer_types`
+  tableName: `offer_types`,
+  timestamps: true,
+  paranoid: true,
+  createdAt: `created_at`,
+  updatedAt: `updated_at`,
+  deletedAt: `deleted_at`
 }
 );
 
