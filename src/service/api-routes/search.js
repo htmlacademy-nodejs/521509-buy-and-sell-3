@@ -10,7 +10,7 @@ module.exports = (searchService) => {
 
   const router = new Router();
 
-  router.get(`/`, (req, res) => {
+  router.get(`/`, async (req, res) => {
     const {query = ``} = req.query;
 
     if (!query) {
@@ -19,7 +19,7 @@ module.exports = (searchService) => {
       return;
     }
 
-    const searchResults = searchService.searchByTitle(query);
+    const searchResults = await searchService.searchByTitle(query);
 
     res.status(HttpCode.OK).json(searchResults);
   });

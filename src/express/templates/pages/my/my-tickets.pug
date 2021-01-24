@@ -13,16 +13,18 @@ block content
             li.tickets-list__item.js-card
               .ticket-card.ticket-card--color06
                 .ticket-card__img
-                  img(src=`/img/${oneOffer.picture}` alt=`${oneOffer.title}`)
+                  img(src=`/img/${oneOffer.imageUrl}` alt=`${oneOffer.title}`)
                 .ticket-card__info
-                  +getTicketLabel(oneOffer.type)(class=`span.ticket-card__label`)
+                  +getTicketLabel(oneOffer.offerType)(class=`span.ticket-card__label`)
                   .ticket-card__categories
-                    a(href='#') #{oneOffer.category.join(`, `)}
+                    each category in oneOffer.categories
+                      a(href="#") #{category.title}
+
                   .ticket-card__header
                     h3.ticket-card__title
                       a(href='#') #{oneOffer.title}
                     p.ticket-card__price
-                      span.js-sum #{oneOffer.sum}
+                      span.js-sum #{oneOffer.cost}
                       |  ₽
                 button.ticket-card__del.js-delete(type='button') Удалить
 

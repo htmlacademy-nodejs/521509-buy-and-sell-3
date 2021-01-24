@@ -14,16 +14,17 @@ block content
             li.tickets-list__item
               .ticket-card.ticket-card--color01
                 .ticket-card__img
-                  img(src=`/img/${oneOffer.picture}` alt=oneOffer.title)
+                  img(src=`/img/${oneOffer.imageUrl}` alt=oneOffer.title)
                 .ticket-card__info
-                  +getTicketLabel(oneOffer.type)
+                  +getTicketLabel(oneOffer.offerType)
                   .ticket-card__categories
-                    a(href='#') #{oneOffer.category.join(`, `)}
+                    each category in oneOffer.categories
+                      a(href="#") #{category.title}
                   .ticket-card__header
                     h3.ticket-card__title
                       a(href='#') #{oneOffer.title}
                     p.ticket-card__price
-                      span.js-sum #{oneOffer.sum}
+                      span.js-sum #{oneOffer.cost}
                       |  ₽
                   .ticket-card__desc
                     p #{oneOffer.description}

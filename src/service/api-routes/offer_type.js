@@ -4,14 +4,13 @@ const {Router} = require(`express`);
 const {HttpCode} = require(`../../consts`);
 
 
-module.exports = (categoryService) => {
+module.exports = (offerTypeService) => {
   const router = new Router();
 
   router.get(`/`, async (req, res) => {
-    const {isWithCount} = req.query;
+    const offerTypes = await offerTypeService.getAll();
 
-    const categories = await categoryService.getAll(isWithCount);
-    res.status(HttpCode.OK).json(categories);
+    res.status(HttpCode.OK).json(offerTypes);
   });
 
   return router;

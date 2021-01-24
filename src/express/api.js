@@ -22,20 +22,24 @@ class API {
     return response.data;
   }
 
-  getOffers() {
-    return this._request(`/offers`);
+  getOffers({isWithComments} = {isWithComments: false}) {
+    return this._request(`/offers`, {params: {isWithComments}});
   }
 
   getOffer(id) {
     return this._request(`/offers/${id}`);
   }
 
+  getOfferTypes() {
+    return this._request(`/offer-types`);
+  }
+
   search(query) {
     return this._request(`/search`, {params: {query}});
   }
 
-  getCategories() {
-    return this._request(`/category`);
+  getCategories({isWithCount} = {isWithCount: false}) {
+    return this._request(`/category`, {params: {isWithCount}});
   }
 
   createOffer(data) {

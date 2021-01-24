@@ -3,22 +3,35 @@
 /**
  * Сервис для работы с поиском
  */
+const {Op} = require(`sequelize`);
+const Alias = require(`../models/aliase`);
+
 
 class SearchService {
   /**
-   * @param {Object[]} offers - массив объявлений
+   * @param {Sequelize} sequelize - экземпляр sequelize
    */
-  constructor(offers) {
-    this._offers = offers;
+  constructor(sequelize) {
+    this._offerModel = sequelize.models.Offer;
   }
 
   /**
    * Поиск по заголовкам объявлений.
+   * @async
    * @param {String} searchText - поисковый запрос
    * @return {Object[]} - найденные объявления
    */
-  searchByTitle(searchText) {
-    return this._offers.filter((it) => it.title.toLowerCase().includes(searchText.toLowerCase()));
+  async searchByTitle(searchText) {
+    const offers = await this._offerModel.findAll({
+      where: {
+        title: {
+          // чувствительно к регистру, но не должно.
+          [Op.iLike]: `%${searchText}%`
+        }
+      },
+      include: [Alias.CATEGORIES, Alias.OFFER_TYPE]
+    });
+    return offers.map((offer) => offer.get());
   }
 }
 
