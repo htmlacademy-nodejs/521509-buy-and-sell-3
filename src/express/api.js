@@ -22,8 +22,8 @@ class API {
     return response.data;
   }
 
-  getOffers({isWithComments} = {isWithComments: false}) {
-    return this._request(`/offers`, {params: {isWithComments}});
+  getOffers({limit, offset, isWithComments, categoryId} = {}) {
+    return this._request(`/offers`, {params: {limit, offset, categoryId, isWithComments}});
   }
 
   getOffer(id) {
