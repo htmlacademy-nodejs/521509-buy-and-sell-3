@@ -88,6 +88,14 @@ const Methods = {
   DELETE: `DELETE`
 };
 
+/**
+ * Максимальное количество объявлений на странице
+ * @const
+ * @type {Number}
+ * @default 8
+ */
+const MAX_OFFERS_QUERY = 8;
+
 module.exports = {
   DEFAULT_COMMAND,
   ExitCodes,
@@ -96,5 +104,6 @@ module.exports = {
   MAX_ID_LENGTH,
   API_PREFIX,
   Env,
-  Methods
+  Methods,
+  MAX_OFFERS_QUERY
 };

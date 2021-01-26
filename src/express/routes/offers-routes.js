@@ -11,6 +11,7 @@ const path = require(`path`);
 const {Router} = require(`express`);
 const {nanoid} = require(`nanoid`);
 const multer = require(`multer`);
+const {MAX_OFFERS_QUERY} = require(`../../consts`);
 
 const UPLOAD_DIR = `../../../upload/img/`;
 
@@ -65,6 +66,23 @@ offersRoutes.get(`/edit/:id`, async (req, res) => {
   res.render(`pages/offers/ticket-edit`, {oneOffer, categories, allOfferTypes: offerTypes});
 });
 
-offersRoutes.get(`/category/:id`, (req, res) => res.render(`pages/offers/category`));
+offersRoutes.get(`/category/:id`, async (req, res) => {
+  const categoryId = req.params[`id`];
+
+  let {page = 1} = req.query;
+  page = +page;
+
+  const offset = (page - 1) * MAX_OFFERS_QUERY;
+  const [
+    {count, offers},
+    categories
+  ] = await Promise.all([
+    api.getOffers({offset, categoryId: req.params[`categoryId`]}),
+    api.getCategories({isWithCount: true})
+  ]);
+  const totalPages = Math.ceil(count / MAX_OFFERS_QUERY);
+
+  res.render(`pages/offers/category`, {allOffers: offers, categories, page, totalPages, prefix: `${categoryId}?`});
+});
 
 module.exports = offersRoutes;

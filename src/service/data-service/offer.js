@@ -13,6 +13,7 @@ class OfferService {
     this._offerModel = sequelize.models.Offer;
     this._commentModel = sequelize.models.Comment;
     this._categoryModel = sequelize.models.Category;
+    this._offerCategoryModel = sequelize.models.OfferCategory;
   }
 
   /**
@@ -58,6 +59,50 @@ class OfferService {
     }
     const offers = await this._offerModel.findAll({include});
     return offers.map((item) => item.get());
+  }
+
+  /**
+   * Отдача постранично всех объявлений, которые есть.
+   * @async
+   * @param {Number} limit - лимит по количеству объявлений
+   * @param {Number} offset - сдвиг для получения нужной страницы
+   * @param {Number} categoryId - id категории, если нужно только для определенной категории
+   * @param {Boolean} isWithComments - нужны ли комментарии
+   * @return {Object[]}
+   */
+  async getPage(limit, offset, categoryId, isWithComments) {
+    const include = [Aliase.OFFER_TYPE];
+    if (isWithComments) {
+      include.push(Aliase.COMMENTS);
+    }
+
+    // Временно тут, чтобы спросить в ТГ.
+    // не нравится, что-то не то. Во первых громоздко, во вторых, все остальные категории для данного объявления теряются.
+    // получается, что объявление только с одной этой категорией, а других будто и нет.
+    if (categoryId) {
+      include.push({
+        model: this._categoryModel,
+        as: Aliase.CATEGORIES,
+        through: {
+          where: {
+            'category_id': categoryId
+          },
+          required: true
+        },
+        required: true
+      });
+    } else {
+      include.push(Aliase.CATEGORIES);
+    }
+
+    const {count, rows} = await this._offerModel.findAndCountAll({
+      limit,
+      offset,
+      include,
+      distinct: true
+    });
+
+    return {count, offers: rows};
   }
 
   /**

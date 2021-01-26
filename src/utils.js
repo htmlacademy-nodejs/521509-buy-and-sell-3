@@ -7,6 +7,8 @@
 
 const fs = require(`fs`).promises;
 
+const {MAX_OFFERS_QUERY} = require(`./consts`);
+
 /**
  * getRandomNumber генерирует случайное число в пределах переданных функции.
  *
@@ -128,6 +130,39 @@ const getRandomDateInPast = (max) => {
   return new Date(Date.now() - getRandomNumber(0, max));
 };
 
+const parseLimitAndOffset = (limit, offset) => {
+  let limitCount = Number.parseInt(limit, 10);
+  let offsetCount = Number.parseInt(offset, 10);
+  if (isNaN(limitCount) || limitCount <= 0 || limitCount > MAX_OFFERS_QUERY) {
+    limitCount = MAX_OFFERS_QUERY;
+  }
+  if (isNaN(offsetCount) || offsetCount < 0) {
+    offsetCount = 0;
+  }
+  return {limitCount, offsetCount};
+};
+
+const getNextAndPrevUrl = (req, totalCount, limitCount, offsetCount, isWithComments) => {
+  const totalPages = Math.ceil(totalCount / limitCount);
+  const currentPage = Math.ceil((offsetCount / limitCount) + 1);
+
+  let nextPage = null;
+  let previousPage = null;
+
+  const baseUrl = (req.protocol + `://` + req.get(`host`) + req.originalUrl.split(`/?`)[0]);
+
+  if (currentPage < totalPages) {
+    nextPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount + limitCount}&isWithComments=${!!isWithComments}`;
+  }
+
+  if (currentPage > 1) {
+    previousPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount - limitCount}&isWithComments=${!!isWithComments}`;
+  }
+
+  return {nextPage, previousPage};
+};
+
+
 module.exports = {
   getRandomNumber,
   getRandomItemInArray,
@@ -136,5 +171,7 @@ module.exports = {
   writeFile,
   readFileToArray,
   readFileInJSON,
-  getRandomDateInPast
+  getRandomDateInPast,
+  parseLimitAndOffset,
+  getNextAndPrevUrl
 };

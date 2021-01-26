@@ -2,11 +2,14 @@
 
 const {Router} = require(`express`);
 
-const {HttpCode} = require(`../../consts`);
+
 const offerExists = require(`../middlewares/offer-exists`);
 const offerValidator = require(`../middlewares/offer-validator`);
 const commentExists = require(`../middlewares/comment-exists`);
 const commentValidator = require(`../middlewares/comment-validator`);
+
+const {HttpCode} = require(`../../consts`);
+const {parseLimitAndOffset, getNextAndPrevUrl} = require(`../../utils`);
 
 
 module.exports = (offerService, commentService) => {
@@ -14,8 +17,14 @@ module.exports = (offerService, commentService) => {
 
 
   router.get(`/`, async (req, res) => {
-    const {isWithComments} = req.query;
-    const offers = await offerService.getAll(isWithComments);
+    const {limit, offset, categoryId, isWithComments} = req.query;
+
+    const {limitCount, offsetCount} = parseLimitAndOffset(limit, offset);
+
+    let offers = await offerService.getPage(limitCount, offsetCount, categoryId, isWithComments);
+
+    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, limitCount, offsetCount, isWithComments)};
+
     res.status(HttpCode.OK).json(offers);
   });
 
