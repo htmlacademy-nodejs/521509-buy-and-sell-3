@@ -13,7 +13,6 @@ class CategoryService {
    */
   constructor(sequelize) {
     this._categoryModel = sequelize.models.Category;
-    this._offerModel = sequelize.models.Offer;
     this._offerCategoryModel = sequelize.models.OfferCategory;
   }
 
@@ -48,36 +47,6 @@ class CategoryService {
     }
     return await this._categoryModel.findAll({raw: true});
   }
-
-  // не удачная попытка получать все объявления категории. Невозможно посчитать количество объявлений.
-  async getOffers(categoryId, limit, offset, isWithComments) {
-    const include = [Aliase.CATEGORIES, Aliase.OFFER_TYPE];
-    if (isWithComments) {
-      include.push(Aliase.COMMENTS);
-    }
-    const {count, rows} = await this._categoryModel.findAndCountAll({
-      attributes: [],
-
-      where: {
-        id: categoryId
-      },
-      include: [
-        {
-          model: this._offerModel,
-          as: Aliase.OFFERS,
-          include,
-          limit: 2
-        }
-      ],
-      distinct: true,
-      limit,
-      offset
-    }
-    );
-    return {count, offers: rows[0].offers};
-  }
-
-
 }
 
 module.exports = CategoryService;
