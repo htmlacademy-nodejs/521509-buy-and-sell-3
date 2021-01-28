@@ -21,9 +21,14 @@ module.exports = (offerService, commentService) => {
 
     const {limitCount, offsetCount} = parseLimitAndOffset(limit, offset);
 
-    let offers = await offerService.getPage(limitCount, offsetCount, categoryId, isWithComments);
+    let offers;
+    if (categoryId) {
+      offers = await offerService.getPage(limitCount, offsetCount, isWithComments);
+    } else {
+      offers = await offerService.getPageByCategory(limitCount, offsetCount, categoryId, isWithComments);
+    }
 
-    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, limitCount, offsetCount, isWithComments)};
+    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, limitCount, offsetCount, {isWithComments, categoryId})};
 
     res.status(HttpCode.OK).json(offers);
   });

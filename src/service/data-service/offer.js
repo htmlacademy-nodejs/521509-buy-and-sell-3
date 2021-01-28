@@ -66,21 +66,42 @@ class OfferService {
    * @async
    * @param {Number} limit - лимит по количеству объявлений
    * @param {Number} offset - сдвиг для получения нужной страницы
+   * @param {Boolean} isWithComments - нужны ли комментарии
+   * @return {Object[]}
+   */
+  async getPage(limit, offset, isWithComments) {
+    const include = [Aliase.CATEGORIES, Aliase.OFFER_TYPE];
+    if (isWithComments) {
+      include.push(Aliase.COMMENTS);
+    }
+    const {count, rows} = await this._offerModel.findAndCountAll({
+      limit,
+      offset,
+      distinct: true,
+      include
+    });
+
+    return {count, offers: rows};
+  }
+
+  /**
+   * Отдача постранично всех объявлений для указанной категории.
+   * @async
+   * @param {Number} limit - лимит по количеству объявлений
+   * @param {Number} offset - сдвиг для получения нужной страницы
    * @param {Number} categoryId - id категории, если нужно только для определенной категории
    * @param {Boolean} isWithComments - нужны ли комментарии
    * @return {Object[]}
    */
-  async getPage(limit, offset, categoryId, isWithComments) {
-    const include = [Aliase.OFFER_TYPE];
-    if (isWithComments) {
-      include.push(Aliase.COMMENTS);
-    }
-
-    // Временно тут, чтобы спросить в ТГ.
-    // не нравится, что-то не то. Во первых громоздко, во вторых, все остальные категории для данного объявления теряются.
-    // получается, что объявление только с одной этой категорией, а других будто и нет.
-    if (categoryId) {
-      include.push({
+  async getPageByCategory(limit, offset, categoryId, isWithComments) {
+    // получаем id объявлений на 1 странице.
+    const {count, rows} = await this._offerModel.findAndCountAll({
+      attributes: [`id`],
+      limit,
+      offset,
+      // distinct: true,
+      include: [{
+        attributes: [],
         model: this._categoryModel,
         as: Aliase.CATEGORIES,
         through: {
@@ -90,19 +111,22 @@ class OfferService {
           required: true
         },
         required: true
-      });
-    } else {
-      include.push(Aliase.CATEGORIES);
-    }
-
-    const {count, rows} = await this._offerModel.findAndCountAll({
-      limit,
-      offset,
-      include,
-      distinct: true
+      }]
     });
 
-    return {count, offers: rows};
+    // получаем полные объявления по найденным id.
+    const include = [Aliase.CATEGORIES, Aliase.OFFER_TYPE];
+    if (isWithComments) {
+      include.push(Aliase.COMMENTS);
+    }
+    const offers = await this._offerModel.findAll({
+      where: {
+        id: rows.map((it) => it.id)
+      },
+      include
+    });
+
+    return {count, offers: offers.map((item) => item.get())};
   }
 
   /**

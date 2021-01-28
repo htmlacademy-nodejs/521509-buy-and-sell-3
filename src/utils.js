@@ -6,6 +6,7 @@
  */
 
 const fs = require(`fs`).promises;
+const querystring = require(`querystring`);
 
 const {PAGE_SIZE} = require(`./consts`);
 
@@ -142,7 +143,7 @@ const parseLimitAndOffset = (limit, offset) => {
   return {limitCount, offsetCount};
 };
 
-const getNextAndPrevUrl = (req, totalCount, limitCount, offsetCount, isWithComments) => {
+const getNextAndPrevUrl = (req, totalCount, limitCount, offsetCount, queryObject) => {
   const totalPages = Math.ceil(totalCount / limitCount);
   const currentPage = Math.ceil((offsetCount / limitCount) + 1);
 
@@ -152,11 +153,11 @@ const getNextAndPrevUrl = (req, totalCount, limitCount, offsetCount, isWithComme
   const baseUrl = (req.protocol + `://` + req.get(`host`) + req.originalUrl.split(`/?`)[0]);
 
   if (currentPage < totalPages) {
-    nextPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount + limitCount}&isWithComments=${!!isWithComments}`;
+    nextPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount + limitCount}&${querystring.stringify(queryObject)}`;
   }
 
   if (currentPage > 1) {
-    previousPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount - limitCount}&isWithComments=${!!isWithComments}`;
+    previousPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount - limitCount}&${querystring.stringify(queryObject)}`;
   }
 
   return {nextPage, previousPage};
