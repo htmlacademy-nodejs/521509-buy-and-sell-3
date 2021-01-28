@@ -80,6 +80,11 @@ const Env = {
   TESTING: `testing`
 };
 
+/**
+ * HTTP методы
+ * @const
+ * @type {Object}
+ */
 const Methods = {
   GET: `GET`,
   POST: `POST`,
@@ -94,7 +99,7 @@ const Methods = {
  * @type {Number}
  * @default 8
  */
-const MAX_OFFERS_QUERY = 8;
+const PAGE_SIZE = 8;
 
 module.exports = {
   DEFAULT_COMMAND,
@@ -105,5 +110,5 @@ module.exports = {
   API_PREFIX,
   Env,
   Methods,
-  MAX_OFFERS_QUERY
+  PAGE_SIZE
 };

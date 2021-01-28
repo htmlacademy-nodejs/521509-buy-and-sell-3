@@ -7,7 +7,7 @@
 
 const fs = require(`fs`).promises;
 
-const {MAX_OFFERS_QUERY} = require(`./consts`);
+const {PAGE_SIZE} = require(`./consts`);
 
 /**
  * getRandomNumber генерирует случайное число в пределах переданных функции.
@@ -133,8 +133,8 @@ const getRandomDateInPast = (max) => {
 const parseLimitAndOffset = (limit, offset) => {
   let limitCount = Number.parseInt(limit, 10);
   let offsetCount = Number.parseInt(offset, 10);
-  if (isNaN(limitCount) || limitCount <= 0 || limitCount > MAX_OFFERS_QUERY) {
-    limitCount = MAX_OFFERS_QUERY;
+  if (isNaN(limitCount) || limitCount <= 0 || limitCount > PAGE_SIZE) {
+    limitCount = PAGE_SIZE;
   }
   if (isNaN(offsetCount) || offsetCount < 0) {
     offsetCount = 0;

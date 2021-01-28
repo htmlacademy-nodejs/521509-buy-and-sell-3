@@ -11,7 +11,7 @@ const path = require(`path`);
 const {Router} = require(`express`);
 const {nanoid} = require(`nanoid`);
 const multer = require(`multer`);
-const {MAX_OFFERS_QUERY} = require(`../../consts`);
+const {PAGE_SIZE} = require(`../../consts`);
 
 const UPLOAD_DIR = `../../../upload/img/`;
 
@@ -72,7 +72,7 @@ offersRoutes.get(`/category/:id`, async (req, res) => {
   let {page = 1} = req.query;
   page = +page;
 
-  const offset = (page - 1) * MAX_OFFERS_QUERY;
+  const offset = (page - 1) * PAGE_SIZE;
   const [
     {count, offers},
     categories
@@ -80,7 +80,7 @@ offersRoutes.get(`/category/:id`, async (req, res) => {
     api.getOffers({offset, categoryId: req.params[`categoryId`]}),
     api.getCategories({isWithCount: true})
   ]);
-  const totalPages = Math.ceil(count / MAX_OFFERS_QUERY);
+  const totalPages = Math.ceil(count / PAGE_SIZE);
 
   res.render(`pages/offers/category`, {allOffers: offers, categories, page, totalPages, prefix: `${categoryId}?`});
 });
