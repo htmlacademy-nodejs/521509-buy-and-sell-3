@@ -131,36 +131,23 @@ const getRandomDateInPast = (max) => {
   return new Date(Date.now() - getRandomNumber(0, max));
 };
 
-const parseLimitAndOffset = (limit, offset) => {
-  let limitCount = Number.parseInt(limit, 10);
-  let offsetCount = Number.parseInt(offset, 10);
-  if (isNaN(limitCount) || limitCount <= 0 || limitCount > PAGE_SIZE) {
-    limitCount = PAGE_SIZE;
-  }
-  if (isNaN(offsetCount) || offsetCount < 0) {
-    offsetCount = 0;
-  }
-  return {limitCount, offsetCount};
-};
-
-const getNextAndPrevUrl = (req, totalCount, limitCount, offsetCount, queryObject) => {
-  const totalPages = Math.ceil(totalCount / limitCount);
-  const currentPage = Math.ceil((offsetCount / limitCount) + 1);
+const getNextAndPrevUrl = (req, totalCount, currentPage, queryObject) => {
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   let nextPage = null;
   let previousPage = null;
 
-  const baseUrl = (req.protocol + `://` + req.get(`host`) + req.originalUrl.split(`/?`)[0]);
+  const baseUrl = (req.protocol + `://` + req.get(`host`) + req.baseUrl);
 
   if (currentPage < totalPages) {
-    nextPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount + limitCount}&${querystring.stringify(queryObject)}`;
+    nextPage = `${baseUrl}/?page=${currentPage + 1}&${querystring.stringify(queryObject)}`;
   }
 
   if (currentPage > 1) {
-    previousPage = `${baseUrl}/?limit=${limitCount}&offset=${offsetCount - limitCount}&${querystring.stringify(queryObject)}`;
+    previousPage = `${baseUrl}/?page=${currentPage - 1}&${querystring.stringify(queryObject)}`;
   }
 
-  return {nextPage, previousPage};
+  return {nextPage, previousPage, totalPages};
 };
 
 
@@ -173,6 +160,5 @@ module.exports = {
   readFileToArray,
   readFileInJSON,
   getRandomDateInPast,
-  parseLimitAndOffset,
   getNextAndPrevUrl
 };

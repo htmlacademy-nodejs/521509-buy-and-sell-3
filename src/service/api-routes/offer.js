@@ -9,7 +9,7 @@ const commentExists = require(`../middlewares/comment-exists`);
 const commentValidator = require(`../middlewares/comment-validator`);
 
 const {HttpCode} = require(`../../consts`);
-const {parseLimitAndOffset, getNextAndPrevUrl} = require(`../../utils`);
+const {getNextAndPrevUrl} = require(`../../utils`);
 
 
 module.exports = (offerService, commentService) => {
@@ -17,18 +17,20 @@ module.exports = (offerService, commentService) => {
 
 
   router.get(`/`, async (req, res) => {
-    const {limit, offset, categoryId, isWithComments} = req.query;
+    let {page, categoryId, isWithComments} = req.query;
 
-    const {limitCount, offsetCount} = parseLimitAndOffset(limit, offset);
-
-    let offers;
-    if (categoryId) {
-      offers = await offerService.getPage(limitCount, offsetCount, isWithComments);
-    } else {
-      offers = await offerService.getPageByCategory(limitCount, offsetCount, categoryId, isWithComments);
+    if (Number.isNaN(+page)) {
+      page = 1;
     }
 
-    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, limitCount, offsetCount, {isWithComments, categoryId})};
+    let offers;
+    if (!categoryId) {
+      offers = await offerService.getPage(+page, isWithComments);
+    } else {
+      offers = await offerService.getPageByCategory(+page, categoryId, isWithComments);
+    }
+
+    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, +page, {isWithComments, categoryId})};
 
     res.status(HttpCode.OK).json(offers);
   });

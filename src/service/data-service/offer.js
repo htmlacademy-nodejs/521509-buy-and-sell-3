@@ -1,6 +1,7 @@
 'use strict';
 
 const Aliase = require(`../models/aliase`);
+const {PAGE_SIZE} = require(`../../consts`);
 
 /**
  * Сервис для работы с объявлениями
@@ -64,19 +65,18 @@ class OfferService {
   /**
    * Отдача постранично всех объявлений, которые есть.
    * @async
-   * @param {Number} limit - лимит по количеству объявлений
-   * @param {Number} offset - сдвиг для получения нужной страницы
+   * @param {Number} page - номер страницы
    * @param {Boolean} isWithComments - нужны ли комментарии
    * @return {Object[]}
    */
-  async getPage(limit, offset, isWithComments) {
+  async getPage(page, isWithComments) {
     const include = [Aliase.CATEGORIES, Aliase.OFFER_TYPE];
     if (isWithComments) {
       include.push(Aliase.COMMENTS);
     }
     const {count, rows} = await this._offerModel.findAndCountAll({
-      limit,
-      offset,
+      limit: PAGE_SIZE,
+      offset: (PAGE_SIZE * (page - 1)),
       distinct: true,
       include
     });
@@ -87,18 +87,17 @@ class OfferService {
   /**
    * Отдача постранично всех объявлений для указанной категории.
    * @async
-   * @param {Number} limit - лимит по количеству объявлений
-   * @param {Number} offset - сдвиг для получения нужной страницы
+   * @param {Number} page - номер страницы
    * @param {Number} categoryId - id категории, если нужно только для определенной категории
    * @param {Boolean} isWithComments - нужны ли комментарии
    * @return {Object[]}
    */
-  async getPageByCategory(limit, offset, categoryId, isWithComments) {
+  async getPageByCategory(page, categoryId, isWithComments) {
     // получаем id объявлений на 1 странице.
     const {count, rows} = await this._offerModel.findAndCountAll({
       attributes: [`id`],
-      limit,
-      offset,
+      limit: PAGE_SIZE,
+      offset: (PAGE_SIZE * (page - 1)),
       // distinct: true,
       include: [{
         attributes: [],
