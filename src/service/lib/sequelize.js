@@ -3,8 +3,18 @@
 /**
  * Модуль подключает sequelize c параметрами окружения из .env
  */
+const path = require(`path`);
+
 const Sequelize = require(`sequelize`);
 const {getLogger} = require(`./logger`);
+
+const {Env} = require(`../../consts`);
+
+if (process.env.NODE_ENV === Env.TESTING) {
+  require(`dotenv`).config({path: path.resolve(__dirname, `../../../test.env`)});
+} else {
+  require(`dotenv`).config({path: path.resolve(__dirname, `../../../.env`)});
+}
 
 /**
  * Забираем все необходимые переменные
