@@ -3,78 +3,28 @@
 const express = require(`express`);
 const request = require(`supertest`);
 
+const initDB = require(`../lib/init-db`);
+const {getSequelize} = require(`../lib/sequelize`);
+
 const categoryRouter = require(`./category`);
 const CategoryService = require(`../data-service/category`);
+const defineModels = require(`../models`);
 
 const {HttpCode} = require(`../../consts`);
 
-const MOCK_DATA = [
-  {
-    type: `offer`,
-    id: `1ixLw`,
-    title: `Куплю породистого кота`,
-    picture: `item7.jpg`,
-    description: `Две страницы заляпаны свежим кофе. Если товар не понравится — верну всё до последней копейки. Бонусом отдам все аксессуары. При покупке с меня бесплатная доставка в черте города. Даю недельную гарантию. Это настоящая находка для коллекционера! Таких предложений больше нет! Не пытайтесь торговаться. Цену вещам я знаю. Если найдёте дешевле — сброшу цену. Онлайн-показ. Мой дед не мог её сломать. Кому нужен этот новый телефон, если тут такое... Встреча только в масках и перчатках. Посмотреть или показать приезжайте сами, я не хочу никуда ехать.`,
-    sum: 39616,
-    category: [
-      `Посуда`
-    ],
-    comments: []
-  },
-  {
-    type: `sale`,
-    id: `ASvz5`,
-    title: `Продам книги Стивена Кинга`,
-    picture: `item4.jpg`,
-    description: `Если найдёте дешевле — сброшу цену. Продаю с болью в сердце... Кому нужен этот новый телефон, если тут такое... Не надо спорить. Встреча возможна только онлайн. Посмотреть или показать приезжайте сами, я не хочу никуда ехать. Если товар не понравится — верну всё до последней копейки. Таких предложений больше нет! Даю недельную гарантию. Обоснованный торг на месте. Две страницы заляпаны свежим кофе. Не пытайтесь торговаться. Цену вещам я знаю. Кажется, что это хрупкая вещь. Мой дед не мог её сломать. Бонусом отдам все аксессуары. Товар в отличном состоянии. Встреча только в масках и перчатках. При покупке с меня бесплатная доставка в черте города.`,
-    sum: 73691,
-    category: [
-      `Книги`
-    ],
-    comments: [
-      {
-        id: `xy2O9`,
-        text: `Оплата наличными или перевод на карту?Почему в таком ужасном состоянии?Неплохо, но дорого`
-      }
-    ]
-  },
-  {
-    type: `sale`,
-    id: `fyOT9`,
-    title: `Продам игрушку для собак`,
-    picture: `item6.jpg`,
-    description: `При покупке с меня бесплатная доставка в черте города. Это настоящая находка для коллекционера! Если найдёте дешевле — сброшу цену. Встреча возможна только онлайн. Даю недельную гарантию. Встреча только в масках и перчатках. Кажется, что это хрупкая вещь. Бонусом отдам все аксессуары. Пользовались бережно и только по большим праздникам. Онлайн-показ. Продаю с болью в сердце... Посмотреть или показать приезжайте сами, я не хочу никуда ехать.`,
-    sum: 41254,
-    category: [
-      `Животные`,
-      `Игры`
-    ],
-    comments: [
-      {
-        id: `jtwul`,
-        text: `Оплата наличными или перевод на карту?С чем связана продажа? Почему так дешёво?Продаю в связи с переездом. Отрываю от сердца.А сколько игр в комплекте?Совсем немного...А где блок питания?Неплохо, но дорогоВы что?! В магазине дешевле.`
-      }
-    ]
-  },
-  {
-    type: `sale`,
-    id: `fyxlQ`,
-    title: `Продам новую приставку Sony Playstation 5`,
-    picture: `item6.jpg`,
-    description: `Не пытайтесь торговаться. Цену вещам я знаю. Если найдёте дешевле — сброшу цену.`,
-    sum: 98861,
-    category: [
-      `Книги`,
-      `Животные`
-    ],
-    comments: []
-  }
-];
+const MOCK_DATA = require(`../../../data/mock-for-test`);
+
 
 const app = express();
 app.use(express.json());
 
-app.use(`/category`, categoryRouter(new CategoryService(MOCK_DATA)));
+const sequelize = getSequelize();
+defineModels(sequelize);
+
+beforeAll(async () => {
+  await initDB(sequelize, MOCK_DATA);
+  app.use(`/category`, categoryRouter(new CategoryService(sequelize)));
+});
 
 
 describe(`API returns category list`, () => {
@@ -87,12 +37,19 @@ describe(`API returns category list`, () => {
 
   test(`Status code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
 
-  test(`Returns list of 3 categories`, () => expect(response.body.length).toBe(4));
+  test(`Returns list of 6 categories`, () => expect(response.body.length).toBe(6));
 
-  test(`Category names are Посуда, Игры, Животные, Книги`,
-      () => expect(response.body).toEqual(
-          expect.arrayContaining([`Посуда`, `Игры`, `Животные`, `Книги`])
+  test(`Category names are Разное, Животные, Книги, Журналы, Посуда, Игры`,
+      () => expect(response.body.map((it) => it.title)).toEqual(
+          expect.arrayContaining([`Разное`, `Животные`, `Книги`, `Журналы`, `Посуда`, `Игры`])
       )
   );
 
+  afterAll(async (done) => {
+    await sequelize.close();
+    done();
+  });
+
 });
+
+
