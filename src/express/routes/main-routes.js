@@ -14,7 +14,6 @@ const api = API.getDefaultAPI();
 
 
 mainRoutes.get(`/`, async (req, res) => {
-  console.log(`here`);
   const [{offers}, categories] = await Promise.all([api.getOffers(), api.getCategories({isWithCount: true})]);
   res.render(`pages/main`, {allOffers: offers, categories});
 });
