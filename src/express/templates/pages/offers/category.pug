@@ -10,8 +10,8 @@ block content
       .tickets-list__wrapper
         .tickets-list__header
           p.tickets-list__title
-            | Электроника
-            b.js-qty 62
+            | #{currentCategory.title}
+            b.js-qty #{currentCategory.count}
         ul
           each oneOffer in allOffers
             li.tickets-list__item

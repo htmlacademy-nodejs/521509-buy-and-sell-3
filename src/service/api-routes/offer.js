@@ -19,7 +19,7 @@ module.exports = (offerService, commentService) => {
   router.get(`/`, async (req, res) => {
     let {page, categoryId, isWithComments} = req.query;
 
-    if (Number.isNaN(+page)) {
+    if (Number.isNaN(+page) || page <= 0) {
       page = 1;
     }
 

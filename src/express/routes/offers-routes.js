@@ -72,17 +72,17 @@ offersRoutes.get(`/category/:id`, async (req, res) => {
   let {page = 1} = req.query;
   page = +page;
 
-  const offset = (page - 1) * PAGE_SIZE;
+
   const [
-    {count, offers},
+    {count, offers, totalPages},
     categories
   ] = await Promise.all([
-    api.getOffers({offset, categoryId: req.params[`categoryId`]}),
+    api.getOffers({page, categoryId}),
     api.getCategories({isWithCount: true})
   ]);
-  const totalPages = Math.ceil(count / PAGE_SIZE);
+  const currentCategory = categories.find((it) => it.id === +categoryId);
 
-  res.render(`pages/offers/category`, {allOffers: offers, categories, page, totalPages, prefix: `${categoryId}?`});
+  res.render(`pages/offers/category`, {allOffers: offers, count, categories, currentCategory, page, totalPages, prefix: `${categoryId}?`});
 });
 
 module.exports = offersRoutes;
