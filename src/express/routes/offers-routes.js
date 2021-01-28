@@ -11,7 +11,6 @@ const path = require(`path`);
 const {Router} = require(`express`);
 const {nanoid} = require(`nanoid`);
 const multer = require(`multer`);
-const {PAGE_SIZE} = require(`../../consts`);
 
 const UPLOAD_DIR = `../../../upload/img/`;
 
