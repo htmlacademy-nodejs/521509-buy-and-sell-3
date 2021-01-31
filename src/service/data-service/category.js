@@ -23,7 +23,6 @@ class CategoryService {
    * @return {Promise}
    */
   async getAll(isWithCount) {
-    console.log(isWithCount);
     if (isWithCount) {
       const result = await this._categoryModel.findAll({
         attributes: [
@@ -48,8 +47,6 @@ class CategoryService {
     }
     return await this._categoryModel.findAll({raw: true});
   }
-
-
 }
 
 module.exports = CategoryService;

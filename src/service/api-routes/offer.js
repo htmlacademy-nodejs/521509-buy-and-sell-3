@@ -2,11 +2,14 @@
 
 const {Router} = require(`express`);
 
-const {HttpCode} = require(`../../consts`);
+
 const offerExists = require(`../middlewares/offer-exists`);
 const offerValidator = require(`../middlewares/offer-validator`);
 const commentExists = require(`../middlewares/comment-exists`);
 const commentValidator = require(`../middlewares/comment-validator`);
+
+const {HttpCode} = require(`../../consts`);
+const {getNextAndPrevUrl} = require(`../../utils`);
 
 
 module.exports = (offerService, commentService) => {
@@ -14,8 +17,21 @@ module.exports = (offerService, commentService) => {
 
 
   router.get(`/`, async (req, res) => {
-    const {isWithComments} = req.query;
-    const offers = await offerService.getAll(isWithComments);
+    let {page, categoryId, isWithComments} = req.query;
+
+    if (Number.isNaN(+page) || page <= 0) {
+      page = 1;
+    }
+
+    let offers;
+    if (!categoryId) {
+      offers = await offerService.getPage(+page, isWithComments);
+    } else {
+      offers = await offerService.getPageByCategory(+page, categoryId, isWithComments);
+    }
+
+    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, +page, {isWithComments, categoryId})};
+
     res.status(HttpCode.OK).json(offers);
   });
 

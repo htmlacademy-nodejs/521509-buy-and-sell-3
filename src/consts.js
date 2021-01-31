@@ -80,6 +80,11 @@ const Env = {
   TESTING: `testing`
 };
 
+/**
+ * HTTP методы
+ * @const
+ * @type {Object}
+ */
 const Methods = {
   GET: `GET`,
   POST: `POST`,
@@ -87,6 +92,14 @@ const Methods = {
   PATH: `PATH`,
   DELETE: `DELETE`
 };
+
+/**
+ * Максимальное количество объявлений на странице
+ * @const
+ * @type {Number}
+ * @default 8
+ */
+const PAGE_SIZE = 8;
 
 module.exports = {
   DEFAULT_COMMAND,
@@ -96,5 +109,6 @@ module.exports = {
   MAX_ID_LENGTH,
   API_PREFIX,
   Env,
-  Methods
+  Methods,
+  PAGE_SIZE
 };

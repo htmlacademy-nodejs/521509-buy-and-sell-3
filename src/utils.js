@@ -6,6 +6,9 @@
  */
 
 const fs = require(`fs`).promises;
+const querystring = require(`querystring`);
+
+const {PAGE_SIZE} = require(`./consts`);
 
 /**
  * getRandomNumber генерирует случайное число в пределах переданных функции.
@@ -128,6 +131,26 @@ const getRandomDateInPast = (max) => {
   return new Date(Date.now() - getRandomNumber(0, max));
 };
 
+const getNextAndPrevUrl = (req, totalCount, currentPage, queryObject) => {
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+  let nextPage = null;
+  let previousPage = null;
+
+  const baseUrl = (req.protocol + `://` + req.get(`host`) + req.baseUrl);
+
+  if (currentPage < totalPages) {
+    nextPage = `${baseUrl}/?page=${currentPage + 1}&${querystring.stringify(queryObject)}`;
+  }
+
+  if (currentPage > 1) {
+    previousPage = `${baseUrl}/?page=${currentPage - 1}&${querystring.stringify(queryObject)}`;
+  }
+
+  return {nextPage, previousPage, totalPages};
+};
+
+
 module.exports = {
   getRandomNumber,
   getRandomItemInArray,
@@ -136,5 +159,6 @@ module.exports = {
   writeFile,
   readFileToArray,
   readFileInJSON,
-  getRandomDateInPast
+  getRandomDateInPast,
+  getNextAndPrevUrl
 };

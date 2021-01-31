@@ -53,6 +53,7 @@ const define = (sequelize) => {
     otherKey: `category_id`
   });
   Category.hasMany(OfferCategory, {as: Alias.OFFER_CATEGORIES, foreignKey: `category_id`});
+  Offer.hasMany(OfferCategory, {as: Alias.OFFER_CATEGORIES, foreignKey: `offer_id`});
 
   /**
    * Связь пользователь - объявление

@@ -65,6 +65,23 @@ offersRoutes.get(`/edit/:id`, async (req, res) => {
   res.render(`pages/offers/ticket-edit`, {oneOffer, categories, allOfferTypes: offerTypes});
 });
 
-offersRoutes.get(`/category/:id`, (req, res) => res.render(`pages/offers/category`));
+offersRoutes.get(`/category/:id`, async (req, res) => {
+  const categoryId = req.params[`id`];
+
+  let {page = 1} = req.query;
+  page = +page;
+
+
+  const [
+    {count, offers, totalPages},
+    categories
+  ] = await Promise.all([
+    api.getOffers({page, categoryId}),
+    api.getCategories({isWithCount: true})
+  ]);
+  const currentCategory = categories.find((it) => it.id === +categoryId);
+
+  res.render(`pages/offers/category`, {allOffers: offers, count, categories, currentCategory, page, totalPages, prefix: `${categoryId}?`});
+});
 
 module.exports = offersRoutes;
