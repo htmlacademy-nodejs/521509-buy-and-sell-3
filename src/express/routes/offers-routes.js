@@ -52,7 +52,19 @@ offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
     await api.createOffer(offerData);
     res.redirect(`/my`);
   } catch (e) {
-    res.redirect(`back`);
+    // не смог найти варианта возвращать на страницу с оставшейся полностью формой.
+    const categories = await api.getCategories();
+    const offerTypes = await api.getOfferTypes();
+    res.render(`pages/offers/new-ticket`, {
+      title: offerData.title,
+      description: offerData.description,
+      cost: offerData.cost,
+      offerTypeId: offerData.typeId,
+      offerCategories: offerData.categories,
+      error: e.response.data.error,
+      categories,
+      allOfferTypes: offerTypes});
+    // res.redirect(`back`, {error: e.response.data.error});
   }
 });
 
