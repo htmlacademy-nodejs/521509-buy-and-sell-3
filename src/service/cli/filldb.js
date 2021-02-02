@@ -323,32 +323,32 @@ module.exports = {
     let categoriesTitles; let saleTitles; let sentences; let commentsSentences;
     let firstnames; let lastnames; let emails;
 
-    try {
-      [categoriesTitles, saleTitles, sentences, commentsSentences, firstnames, lastnames, emails] = await Promise.all([
-        readDataForGeneration(PATH_TO_CATEGORIES),
-        readDataForGeneration(PATH_TO_SALE_TITLES),
-        readDataForGeneration(PATH_TO_SENTENCES),
-        readDataForGeneration(PATH_TO_COMMENTS_SENTENCES),
-        readDataForGeneration(PATH_TO_FIRSTNAMES),
-        readDataForGeneration(PATH_TO_LASTNAMES),
-        readDataForGeneration(PATH_TO_EMAILS)
-      ]);
+    // try {
+    [categoriesTitles, saleTitles, sentences, commentsSentences, firstnames, lastnames, emails] = await Promise.all([
+      readDataForGeneration(PATH_TO_CATEGORIES),
+      readDataForGeneration(PATH_TO_SALE_TITLES),
+      readDataForGeneration(PATH_TO_SENTENCES),
+      readDataForGeneration(PATH_TO_COMMENTS_SENTENCES),
+      readDataForGeneration(PATH_TO_FIRSTNAMES),
+      readDataForGeneration(PATH_TO_LASTNAMES),
+      readDataForGeneration(PATH_TO_EMAILS)
+    ]);
 
-      const offerTypes = generateOfferTypes();
-      const categories = generateCategories(categoriesTitles);
-      const users = generateUsers(DEFAULT_USERS_COUNT, firstnames, lastnames, emails);
-      const offers = generateOffers(countNumber, saleTitles, sentences, users);
-      const comments = generateComments(offers, users, commentsSentences);
-      const offersCategories = generateOffersCategories(offers, categories);
+    const offerTypes = generateOfferTypes();
+    const categories = generateCategories(categoriesTitles);
+    const users = generateUsers(DEFAULT_USERS_COUNT, firstnames, lastnames, emails);
+    const offers = generateOffers(countNumber, saleTitles, sentences, users);
+    const comments = generateComments(offers, users, commentsSentences);
+    const offersCategories = generateOffersCategories(offers, categories);
 
-      await initDB({offerTypes, categories, offers, comments, offersCategories});
+    await initDB(sequelize, {offerTypes, categories, offers, comments, offersCategories});
 
-      logger.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в базу данных`);
-      process.exit(ExitCodes.SUCCESS);
-    } catch (error) {
-      logger.error(`Ошибка: ${error.message}`);
-      process.exit(ExitCodes.FAIL);
-    }
+    logger.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в базу данных`);
+    process.exit(ExitCodes.SUCCESS);
+    // } catch (error) {
+    //   logger.error(`Ошибка: ${error.message}`);
+    //   process.exit(ExitCodes.FAIL);
+    // }
 
   }
 };
