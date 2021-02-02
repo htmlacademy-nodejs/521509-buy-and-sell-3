@@ -24,8 +24,21 @@ const NEW_OFFER = {
   categories: [1, 2]
 };
 
+const NEW_INVALID_OFFER = {
+  typeId: -1,
+  title: `Куплю`,
+  imageUrl: `item1`,
+  description: `Если найдёте.`,
+  cost: 9,
+  categories: null
+};
+
 const NEW_COMMENT = {
-  text: `Comment from JEST`,
+  text: `Comment from JEST. It is Valid.`,
+};
+
+const NEW_INVALID_COMMENT = {
+  text: `Comment.`,
 };
 
 const createAPI = async () => {
@@ -93,7 +106,7 @@ describe(`API creates an offer if data is valid`, () => {
   test(`Status Code 201`, () => expect(response.statusCode).toBe(HttpCode.CREATED));
   test(`Return offer title and cost that created`, () => {
     expect(response.body.title).toBe(`Куплю телевизор`);
-    expect(response.body.cost).toEqual(`11474`);
+    expect(response.body.cost).toEqual(11474);
   });
   test(`Offers count is changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(4)));
 
@@ -110,7 +123,7 @@ describe(`API returns 400 if posting offer is invalid`, () => {
     ({app, sequelize} = await createAPI());
   });
 
-  test(`Status Code 400`, async () => {
+  test(`Status Code 400 without any key.`, async () => {
     for (const key of Object.keys(NEW_OFFER)) {
       const badOffer = {...NEW_OFFER};
       delete badOffer[key];
@@ -120,6 +133,17 @@ describe(`API returns 400 if posting offer is invalid`, () => {
         .expect((res) => expect(res.statusCode).toBe(HttpCode.BAD_REQUEST));
     }
   });
+
+  test(`There are 6 errors in invalid offer`, async () => {
+    await request(app)
+      .post(`/offers`)
+      .send(NEW_INVALID_OFFER)
+      .expect((res) => {
+        expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+        expect(res.body.error.details.length).toBe(6);
+      });
+  });
+
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
   afterAll(async () => {
@@ -140,11 +164,11 @@ describe(`API changes offer after PUT request`, () => {
   test(`Status Code 200`, () => expect(response.statusCode).toBe(HttpCode.OK));
   test(`Return offer that updated`, () => {
     expect(response.body.title).toBe(`Куплю телевизор`);
-    expect(response.body.cost).toEqual(`11474`);
+    expect(response.body.cost).toEqual(11474);
   });
   test(`Offer is really changed`, () => request(app).get(`/offers/2`).expect((res) => {
     expect(res.body.title).toBe(`Куплю телевизор`);
-    expect(res.body.cost).toEqual(`11474`);
+    expect(res.body.cost).toEqual(11474);
   }));
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
@@ -190,6 +214,17 @@ describe(`API returns 400 on updating on invalid offer`, () => {
         .expect((res) => expect(res.statusCode).toBe(HttpCode.BAD_REQUEST));
     }
   });
+
+  test(`There are 6 errors in invalid offer`, async () => {
+    await request(app)
+      .put(`/offers/2`)
+      .send(NEW_INVALID_OFFER)
+      .expect((res) => {
+        expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
+        expect(res.body.error.details.length).toBe(6);
+      });
+  });
+
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
   afterAll(async () => {
@@ -208,7 +243,7 @@ describe(`API delete offer after request`, () => {
   });
 
   test(`Status Code 204`, () => expect(response.statusCode).toBe(HttpCode.DELETED));
-  test(`Offer is really deleted`, () => request(app).get(`/offers/y2`).expect((res) => expect(res.statusCode).toBe(HttpCode.NOT_FOUND)));
+  test(`Offer is really deleted`, () => request(app).get(`/offers/2`).expect((res) => expect(res.statusCode).toBe(HttpCode.NOT_FOUND)));
   test(`Offers count is changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(2)));
 
   afterAll(async () => {
@@ -316,7 +351,7 @@ describe(`API returns 400 if posting comment offer is without any key`, () => {
     ({app, sequelize} = await createAPI());
   });
 
-  test(`Status Code 400`, async () => {
+  test(`Status Code 400 without any key`, async () => {
     for (const key of Object.keys(NEW_COMMENT)) {
       const badComment = {...NEW_COMMENT};
       delete badComment[key];
@@ -326,6 +361,14 @@ describe(`API returns 400 if posting comment offer is without any key`, () => {
         .expect((res) => expect(res.statusCode).toBe(HttpCode.BAD_REQUEST));
     }
   });
+
+  test(`Status code 400 for invalid comment`, async () => {
+    await request(app)
+      .post(`/offers/2/comments`)
+      .send(NEW_INVALID_COMMENT)
+      .expect((res) => expect(res.statusCode).toBe(HttpCode.BAD_REQUEST));
+  });
+
   test(`Offer's comments count isn't changed`, () => request(app).get(`/offers/2/comments/`).expect((res) => expect(res.body.length).toBe(1)));
 
   afterAll(async () => {
