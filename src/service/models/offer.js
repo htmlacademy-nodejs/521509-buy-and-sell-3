@@ -18,7 +18,7 @@ const define = (sequelize) => Offer.init({
     field: `image_url`
   },
   cost: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false
   }
 },
