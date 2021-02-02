@@ -14,14 +14,16 @@ const {HttpCode} = require(`../../consts`);
 
 const MOCK_DATA = require(`../../../data/mock-for-test`);
 
-
-const app = express();
-app.use(express.json());
-
-const sequelize = getSequelize();
-defineModels(sequelize);
+let app;
+let sequelize;
 
 beforeAll(async () => {
+  app = express();
+  app.use(express.json());
+
+  sequelize = getSequelize();
+  defineModels(sequelize);
+
   await initDB(sequelize, MOCK_DATA);
   app.use(`/category`, categoryRouter(new CategoryService(sequelize)));
 });
@@ -45,9 +47,8 @@ describe(`API returns category list`, () => {
       )
   );
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 
 });

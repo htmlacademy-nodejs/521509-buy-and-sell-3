@@ -55,9 +55,8 @@ describe(`API returns all offers`, () => {
   test(`Return array with 3 items`, () => expect(response.body.offers.length).toBe(3));
   test(`Second item id is 2`, () => expect(response.body.offers[1].id).toBe(2));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -76,9 +75,8 @@ describe(`API returns right offer Id`, () => {
   test(`Item id is 2`, () => expect(response.body.id).toBe(2));
   test(`Item title is Продам коллекцию журналов «Огонёк»`, () => expect(response.body.title).toBe(`Продам коллекцию журналов «Огонёк»`));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -99,9 +97,8 @@ describe(`API creates an offer if data is valid`, () => {
   });
   test(`Offers count is changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(4)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -125,9 +122,8 @@ describe(`API returns 400 if posting offer is invalid`, () => {
   });
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -152,9 +148,8 @@ describe(`API changes offer after PUT request`, () => {
   }));
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -172,9 +167,8 @@ describe(`API returns 404 on not existing offer`, () => {
   test(`Returns error with message`, () => expect(response.body.error.message).toBe(`Offer doesn't exist`));
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -198,9 +192,8 @@ describe(`API returns 400 on updating on invalid offer`, () => {
   });
   test(`Offers count isn't changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(3)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -218,9 +211,8 @@ describe(`API delete offer after request`, () => {
   test(`Offer is really deleted`, () => request(app).get(`/offers/y2`).expect((res) => expect(res.statusCode).toBe(HttpCode.NOT_FOUND)));
   test(`Offers count is changed`, () => request(app).get(`/offers`).expect((res) => expect(res.body.offers.length).toBe(2)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -238,9 +230,8 @@ describe(`API get offer's comments`, () => {
   test(`There are 5 comments`, () => expect(response.body.length).toBe(3));
   test(`Second comment text is right`, () => expect(response.body[1].text).toBe(`Оплата наличными или перевод на карту?А где блок питания?А сколько игр в комплекте?Продаю в связи с переездом. Отрываю от сердца.Неплохо, но дорогоВы что?! В магазине дешевле.Совсем немного...С чем связана продажа? Почему так дешёво?`));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -266,9 +257,8 @@ describe(`API delete comment`, () => {
     expect(isCommentIdExist).toBeFalsy();
   }));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -285,9 +275,8 @@ describe(`API delete comment doesn't exist`, () => {
   test(`Status Code 404`, () => expect(response.statusCode).toBe(HttpCode.NOT_FOUND));
   test(`Comments count isn't changed`, () => request(app).get(`/offers/2/comments`).expect((res) => expect(res.body.length).toBe(1)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -314,9 +303,8 @@ describe(`API add comments to offer`, () => {
   }));
   test(`Comments count is changed`, () => request(app).get(`/offers/2/comments/`).expect((res) => expect(res.body.length).toBe(2)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
 
@@ -340,8 +328,7 @@ describe(`API returns 400 if posting comment offer is without any key`, () => {
   });
   test(`Offer's comments count isn't changed`, () => request(app).get(`/offers/2/comments/`).expect((res) => expect(res.body.length).toBe(1)));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 });
