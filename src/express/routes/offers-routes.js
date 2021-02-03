@@ -35,7 +35,7 @@ const api = API.getDefaultAPI();
 offersRoutes.get(`/add`, async (req, res) => {
   const categories = await api.getCategories();
   const offerTypes = await api.getOfferTypes();
-  res.render(`pages/offers/new-ticket`, {categories, allOfferTypes: offerTypes});
+  res.render(`pages/offers/new-ticket`, {categories, allOfferTypes: offerTypes, oneOfferData: {}});
 });
 
 offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
@@ -52,19 +52,13 @@ offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
     await api.createOffer(offerData);
     res.redirect(`/my`);
   } catch (e) {
-    // не смог найти варианта возвращать на страницу с оставшейся полностью формой.
     const categories = await api.getCategories();
     const offerTypes = await api.getOfferTypes();
     res.render(`pages/offers/new-ticket`, {
-      title: offerData.title,
-      description: offerData.description,
-      cost: offerData.cost,
-      offerTypeId: offerData.typeId,
-      offerCategories: offerData.categories,
+      oneOfferData: offerData,
       error: e.response.data.error,
       categories,
       allOfferTypes: offerTypes});
-    // res.redirect(`back`, {error: e.response.data.error});
   }
 });
 
