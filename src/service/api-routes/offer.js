@@ -38,7 +38,7 @@ module.exports = (offerService, commentService) => {
   });
 
 
-  router.get(`/:offerId`, [checkNumberId(), offerExists(offerService)], (req, res) => {
+  router.get(`/:offerId`, [checkNumberId(`offerId`), offerExists(offerService)], (req, res) => {
     const {offer} = res.locals;
 
     res.status(HttpCode.OK).json(offer);
@@ -53,7 +53,7 @@ module.exports = (offerService, commentService) => {
   });
 
 
-  router.put(`/:offerId`, [checkNumberId(), offerExists(offerService), joiValidator(offerSchema)], offerExists(offerService), async (req, res) => {
+  router.put(`/:offerId`, [checkNumberId(`offerId`), offerExists(offerService), joiValidator(offerSchema)], offerExists(offerService), async (req, res) => {
     let updatedOffer = req.body;
     updatedOffer = await offerService.update(req.params[`offerId`], updatedOffer);
 
@@ -61,21 +61,21 @@ module.exports = (offerService, commentService) => {
   });
 
 
-  router.delete(`/:offerId`, [checkNumberId(), offerExists(offerService)], async (req, res) => {
+  router.delete(`/:offerId`, [checkNumberId(`offerId`), offerExists(offerService)], async (req, res) => {
     await offerService.delete(req.params[`offerId`]);
 
     res.status(HttpCode.DELETED).send();
   });
 
 
-  router.get(`/:offerId/comments`, [checkNumberId(), offerExists(offerService)], async (req, res) => {
+  router.get(`/:offerId/comments`, [checkNumberId(`offerId`), offerExists(offerService)], async (req, res) => {
     const comments = await commentService.getAll(req.params[`offerId`]);
 
     res.status(HttpCode.OK).json(comments);
   });
 
 
-  router.post(`/:offerId/comments`, [checkNumberId(), offerExists(offerService), joiValidator(commentSchema)], async (req, res) => {
+  router.post(`/:offerId/comments`, [checkNumberId(`offerId`), offerExists(offerService), joiValidator(commentSchema)], async (req, res) => {
     let newComment = req.body;
     newComment = await commentService.add(req.params[`offerId`], newComment);
 
@@ -83,7 +83,7 @@ module.exports = (offerService, commentService) => {
   });
 
 
-  router.delete(`/:offerId/comments/:commentId`, [checkNumberId(), offerExists(offerService), commentExists(commentService)], async (req, res) => {
+  router.delete(`/:offerId/comments/:commentId`, [checkNumberId(`offerId`, `commentId`), offerExists(offerService), commentExists(commentService)], async (req, res) => {
     await commentService.delete(req.params[`commentId`]);
 
     res.status(HttpCode.DELETED).send();
