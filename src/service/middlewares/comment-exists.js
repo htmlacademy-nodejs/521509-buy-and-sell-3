@@ -13,14 +13,14 @@ module.exports = (commentService) => async (req, res, next) => {
 
   const commentId = req.params[`commentId`];
 
-  logger.debug(`Проверяем, что комментарий ${commentId} существует.`);
+  logger.debug(`Checking that ${commentId} exists...`);
 
   res.locals.comment = await commentService.getOne(commentId);
   if (res.locals.comment) {
-    logger.debug(`Проверка прошла. Комментарий ${commentId} существует.`);
+    logger.debug(`Comment ${commentId} exists.`);
     next();
   } else {
-    logger.error(`Комментарий ${commentId} не существует.`);
+    logger.error(`Comment ${commentId} doesn't exist.`);
     res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Comment doesn't exist`, details: `Comment doesn't exist`}});
   }
 };

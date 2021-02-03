@@ -9,9 +9,9 @@ const {getLogger} = require(`../lib/logger`);
 module.exports = (req, res, next) => {
   const logger = getLogger({name: `api`});
 
-  logger.debug(`Запрос по URL ${req.originalUrl}`);
+  logger.debug(`Request on URL ${req.originalUrl}`);
   res.on(`finish`, () => {
-    logger.info(`Ответ на запрос ${req.originalUrl} : ${res.statusCode}`);
+    logger.info(`Request ${req.originalUrl} finished with code: ${res.statusCode}`);
   });
 
   next();

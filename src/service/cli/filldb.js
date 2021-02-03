@@ -312,43 +312,43 @@ module.exports = {
     const sequelize = getSequelize();
 
     try {
-      logger.info(`Подключаемся к базе данных...`);
+      logger.info(`Connecting to DB...`);
       await sequelize.authenticate();
-      logger.info(`Соединение с базой данных успешно установлено.`);
+      logger.info(`Connected to DB.`);
     } catch (error) {
-      logger.error(`Ошибка: ${error}`);
+      logger.error(`Error: ${error}`);
       process.exit(ExitCodes.FAIL);
     }
 
     let categoriesTitles; let saleTitles; let sentences; let commentsSentences;
     let firstnames; let lastnames; let emails;
 
-    // try {
-    [categoriesTitles, saleTitles, sentences, commentsSentences, firstnames, lastnames, emails] = await Promise.all([
-      readDataForGeneration(PATH_TO_CATEGORIES),
-      readDataForGeneration(PATH_TO_SALE_TITLES),
-      readDataForGeneration(PATH_TO_SENTENCES),
-      readDataForGeneration(PATH_TO_COMMENTS_SENTENCES),
-      readDataForGeneration(PATH_TO_FIRSTNAMES),
-      readDataForGeneration(PATH_TO_LASTNAMES),
-      readDataForGeneration(PATH_TO_EMAILS)
-    ]);
+    try {
+      [categoriesTitles, saleTitles, sentences, commentsSentences, firstnames, lastnames, emails] = await Promise.all([
+        readDataForGeneration(PATH_TO_CATEGORIES),
+        readDataForGeneration(PATH_TO_SALE_TITLES),
+        readDataForGeneration(PATH_TO_SENTENCES),
+        readDataForGeneration(PATH_TO_COMMENTS_SENTENCES),
+        readDataForGeneration(PATH_TO_FIRSTNAMES),
+        readDataForGeneration(PATH_TO_LASTNAMES),
+        readDataForGeneration(PATH_TO_EMAILS)
+      ]);
 
-    const offerTypes = generateOfferTypes();
-    const categories = generateCategories(categoriesTitles);
-    const users = generateUsers(DEFAULT_USERS_COUNT, firstnames, lastnames, emails);
-    const offers = generateOffers(countNumber, saleTitles, sentences, users);
-    const comments = generateComments(offers, users, commentsSentences);
-    const offersCategories = generateOffersCategories(offers, categories);
+      const offerTypes = generateOfferTypes();
+      const categories = generateCategories(categoriesTitles);
+      const users = generateUsers(DEFAULT_USERS_COUNT, firstnames, lastnames, emails);
+      const offers = generateOffers(countNumber, saleTitles, sentences, users);
+      const comments = generateComments(offers, users, commentsSentences);
+      const offersCategories = generateOffersCategories(offers, categories);
 
-    await initDB(sequelize, {offerTypes, categories, offers, comments, offersCategories});
+      await initDB(sequelize, {offerTypes, categories, offers, comments, offersCategories});
 
-    logger.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в базу данных`);
-    process.exit(ExitCodes.SUCCESS);
-    // } catch (error) {
-    //   logger.error(`Ошибка: ${error.message}`);
-    //   process.exit(ExitCodes.FAIL);
-    // }
+      logger.info(`Generated ${countNumber} offers and inserted in DB`);
+      process.exit(ExitCodes.SUCCESS);
+    } catch (error) {
+      logger.error(`Error: ${error.message}`);
+      process.exit(ExitCodes.FAIL);
+    }
 
   }
 };

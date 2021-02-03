@@ -13,7 +13,7 @@ const {HttpCode} = require(`../../consts`);
 module.exports = (...idFields) => async (req, res, next) => {
   const logger = getLogger({name: `api`});
 
-  logger.debug(`Проверяем, что id можно привести к валидному id.`);
+  logger.debug(`Checking that id(s) are valid...`);
 
   const ids = idFields.map((idField) => req.params[idField]);
 
@@ -21,10 +21,10 @@ module.exports = (...idFields) => async (req, res, next) => {
     for (const id of ids) {
       await Joi.number().positive().validateAsync(id);
     }
-    logger.debug(`Id принят(ы).`);
+    logger.debug(`Id(s) are valid.`);
   } catch (e) {
     res.status(HttpCode.BAD_REQUEST).json({error: {code: HttpCode.BAD_REQUEST, message: `Id is invalid`, details: e.details}});
-    logger.debug(`Невозможно привести в валидному id.`);
+    logger.debug(`Id(s) are invalid.`);
     return;
   }
 

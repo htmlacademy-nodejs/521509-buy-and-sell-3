@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
 
   res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Not Found`, details: `This endpoint is not presented`}});
 
-  logger.error(`[404] Пользователь обратился к несуществующему ресурсу: ${req.url}`);
+  logger.error(`[404] User request information, that doesn't exist: ${req.url}`);
 
   next();
 };
