@@ -14,8 +14,8 @@ const myRoutes = new Router();
 const api = API.getDefaultAPI();
 
 myRoutes.get(`/`, async (req, res) => {
-  const allOffers = await api.getOffers();
-  res.render(`pages/my/my-tickets`, {allOffers});
+  const {offers} = await api.getOffers();
+  res.render(`pages/my/my-tickets`, {allOffers: offers});
 });
 myRoutes.get(`/comments`, async (req, res) => {
   const allOffers = await api.getOffers({isWithComments: true});

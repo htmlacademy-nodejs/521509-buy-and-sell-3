@@ -43,11 +43,11 @@ module.exports = {
     const sequelize = getSequelize();
 
     try {
-      logger.info(`Подключаемся к базе данных...`);
+      logger.info(`Connecting to DB...`);
       await sequelize.authenticate();
-      logger.info(`Соединение с базой данных успешно установлено.`);
+      logger.info(`Connected to DB.`);
     } catch (error) {
-      logger.error(`Не удалось подключиться к базе данных: ${error}`);
+      logger.error(`Connection to DB failed: ${error}`);
       process.exit(ExitCodes.FAIL);
     }
 
@@ -62,11 +62,11 @@ module.exports = {
 
     app.listen(portNumber, (err) => {
       if (err) {
-        logger.error(`Ошибка при создании сервера: ${portNumber}: ${err.message}`);
+        logger.error(`Error, server can't be started on: ${portNumber}: ${err.message}`);
         process.exit(ExitCodes.FAIL);
       }
 
-      logger.info(`Сервер поднят успешно на порту: ${portNumber}`);
+      logger.info(`Server is running on port: ${portNumber}`);
     });
   }
 };

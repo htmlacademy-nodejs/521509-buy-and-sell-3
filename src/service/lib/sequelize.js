@@ -39,7 +39,7 @@ const getSequelize = () => {
   const someThingNotDefined = [DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD, DB_POOL_MAX_CONNECTIONS, DB_POOL_MIN_CONNECTIONS, DB_POOL_ACQUIRE, DB_POOL_IDLE].some((it) => it === undefined);
 
   if (someThingNotDefined) {
-    throw new Error(`Не хватает переменных окружения для подключения к БД, смотри 'environments.md'`);
+    throw new Error(`Environments variables not found, check 'environments.md'`);
   }
 
   const logger = getLogger({name: `DB`});
@@ -58,7 +58,6 @@ const getSequelize = () => {
           idle: +DB_POOL_IDLE
         },
         logging: logger.debug.bind(logger)
-        // logging: (...msg) => console.log(msg)
       }
   );
 };

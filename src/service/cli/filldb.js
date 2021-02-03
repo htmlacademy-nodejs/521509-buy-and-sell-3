@@ -312,11 +312,11 @@ module.exports = {
     const sequelize = getSequelize();
 
     try {
-      logger.info(`Подключаемся к базе данных...`);
+      logger.info(`Connecting to DB...`);
       await sequelize.authenticate();
-      logger.info(`Соединение с базой данных успешно установлено.`);
+      logger.info(`Connected to DB.`);
     } catch (error) {
-      logger.error(`Ошибка: ${error}`);
+      logger.error(`Error: ${error}`);
       process.exit(ExitCodes.FAIL);
     }
 
@@ -341,12 +341,12 @@ module.exports = {
       const comments = generateComments(offers, users, commentsSentences);
       const offersCategories = generateOffersCategories(offers, categories);
 
-      await initDB({offerTypes, categories, offers, comments, offersCategories});
+      await initDB(sequelize, {offerTypes, categories, offers, comments, offersCategories});
 
-      logger.info(`Сгенерировано ${countNumber} объявлений и успешно записаны в базу данных`);
+      logger.info(`Generated ${countNumber} offers and inserted in DB`);
       process.exit(ExitCodes.SUCCESS);
     } catch (error) {
-      logger.error(`Ошибка: ${error.message}`);
+      logger.error(`Error: ${error.message}`);
       process.exit(ExitCodes.FAIL);
     }
 

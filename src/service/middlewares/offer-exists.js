@@ -13,14 +13,14 @@ module.exports = (service) => async (req, res, next) => {
 
   const offerId = req.params[`offerId`];
 
-  logger.debug(`Проверяем, что объявление ${offerId} существует.`);
+  logger.debug(`Check that offer ${offerId} exists.`);
 
   try {
     res.locals.offer = await service.getOne(offerId);
-    logger.debug(`Проверка прошла. Объявление ${offerId} существует.`);
+    logger.debug(`Offer ${offerId} exists.`);
     next();
   } catch (err) {
-    logger.error(`Объявление ${offerId} не существует.`);
+    logger.error(`Offer ${offerId} doesn't exist.`);
     res.status(HttpCode.NOT_FOUND).json({error: {code: HttpCode.NOT_FOUND, message: `Offer doesn't exist`, details: err.message}});
   }
 

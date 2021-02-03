@@ -7,33 +7,33 @@ const {getLogger} = require(`../lib/logger`);
 module.exports = async (sequelize, {offerTypes, categories, offers, comments, offersCategories}) => {
   const logger = getLogger({name: `init-db`});
 
-  logger.info(`Создаём новые таблицы...`);
+  logger.info(`Creating tables...`);
   const {OfferType, Category, /* User, */Offer, Comment, OfferCategory} = defineModels(sequelize);
   await sequelize.sync({force: true});
-  logger.info(`Новые таблицы созданы.`);
+  logger.info(`New tables have been created.`);
 
-  logger.info(`Добавляем ${offerTypes.length} типов объявлений.`);
+  logger.info(`Inserting ${offerTypes.length} offer's types.`);
   await OfferType.bulkCreate(offerTypes);
-  logger.info(`Типы объявлений добавлены.`);
+  logger.info(`Offer's types have been inserted.`);
 
-  logger.info(`Добавляем ${categories.length} категорий.`);
+  logger.info(`Inserting ${categories.length} categories.`);
   await Category.bulkCreate(categories);
-  logger.info(`Категории добавлены.`);
+  logger.info(`Categories have been inserted.`);
 
   // Временно отключаем
   // logger.info(`Добавляем ${users.length} пользователей.`);
   // await User.bulkCreate(users);
   // logger.info(`Пользователи добавлены.`);
 
-  logger.info(`Добавляем ${offers.length} объявлений.`);
+  logger.info(`Inserting ${offers.length} offers.`);
   await Offer.bulkCreate(offers);
-  logger.info(`Объявления добавлены.`);
+  logger.info(`Offers have been inserted.`);
 
-  logger.info(`Добавляем ${comments.length} комментарии.`);
+  logger.info(`Inserting ${comments.length} comments.`);
   await Comment.bulkCreate(comments);
-  logger.info(`Комментарии добавлены.`);
+  logger.info(`Comments have been inserted.`);
 
-  logger.info(`Добавляем ${offersCategories.length} связей объявления-категории.`);
+  logger.info(`Inserting ${offersCategories.length} connections offers-categories.`);
   await OfferCategory.bulkCreate(offersCategories);
-  logger.info(`Связи объявления-категории добавлены.`);
+  logger.info(`Connections offers-categories have been inserted.`);
 };

@@ -14,13 +14,16 @@ const {HttpCode} = require(`../../consts`);
 
 const MOCK_DATA = require(`../../../data/mock-for-test`);
 
-const app = express();
-app.use(express.json());
-
-const sequelize = getSequelize();
-defineModels(sequelize);
+let app;
+let sequelize;
 
 beforeAll(async () => {
+  app = express();
+  app.use(express.json());
+
+  sequelize = getSequelize();
+  defineModels(sequelize);
+
   await initDB(sequelize, MOCK_DATA);
   app.use(`/search`, searchRouter(new SearchService(sequelize)));
 });
@@ -63,9 +66,8 @@ describe(`Search API returns 400 and error, if query is missing`, () => {
   test(`Status code 400`, () => expect(response.statusCode).toBe((HttpCode.BAD_REQUEST)));
   test(`Message is correct`, () => expect(response.body.error.message).toBe(`Query string is empty.`));
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await sequelize.close();
-    done();
   });
 
 });
