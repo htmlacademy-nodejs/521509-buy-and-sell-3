@@ -222,7 +222,7 @@ const generateComments = (offers, users, commentsSentences) => {
         'text': getRandomItemsInArray(commentsSentences).join(``),
         'created_at': getRandomDateInPast(MAX_PAST),
         'offer_id': offer._id,
-        'user_id': getRandomItemInArray(users).id
+        'user_id': getRandomItemInArray(users)._id
       };
     }));
   });
@@ -244,7 +244,7 @@ const generateOffers = (count, saleTitles, sentences, users) => {
     return {
       '_id': index + 1,
       'type_id': getRandomNumber(1, 2),
-      'user_id': getRandomItemInArray(users).id,
+      'user_id': getRandomItemInArray(users)._id,
       'title': getRandomItemInArray(saleTitles),
       'description': getRandomItemsInArray(sentences).join(` `),
       'created_at': getRandomDateInPast(MAX_PAST),
