@@ -49,6 +49,13 @@ class API {
     });
   }
 
+  createUser(data) {
+    return this._request(`/user/add`, {
+      method: Methods.POST,
+      data
+    });
+  }
+
   static getDefaultAPI() {
     const baseURL = process.env.API_URL || DEFAULT_BASE_URL;
     return new this(baseURL, TIMEOUT);
