@@ -11,6 +11,8 @@
 
 const path = require(`path`);
 
+const bcrypt = require(`bcrypt`);
+
 const {getLogger} = require(`../lib/logger`);
 const initDB = require(`../lib/init-db`);
 
@@ -41,6 +43,22 @@ const DEFAULT_OFFERS_COUNT = 10;
  * @default 5
  */
 const DEFAULT_USERS_COUNT = 5;
+
+/**
+ * Пароль пользователей по умолчанию
+ * @const
+ * @type {String}
+ * @default 123456
+ */
+const DEFAULT_USERS_PASSWORD = `123456`;
+
+/**
+ * Соль для паролей пользователей по умолчанию
+ * @const
+ * @type {Number}
+ * @default 10
+ */
+const DEFAULT_USERS_PASSWORD_SALT = 10;
 
 
 /**
@@ -200,7 +218,7 @@ const generateUsers = (count, firstNames, lastNames, emails) => {
       lastName: getRandomItemInArray(lastNames),
       email: randomEmails[index],
       avatar: `avatar${(`0` + getRandomNumber(1, 4)).slice(-2)}.jpg`,
-      password: `123`
+      password: bcrypt.hashSync(DEFAULT_USERS_PASSWORD, DEFAULT_USERS_PASSWORD_SALT)
     };
   });
 };
