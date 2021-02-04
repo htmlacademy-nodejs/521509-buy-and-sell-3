@@ -5,21 +5,32 @@ const {DataTypes, Model} = require(`sequelize`);
 class User extends Model {}
 
 const define = (sequelize) => User.init({
-  'avatar_url': {
+  avatar: {
     type: DataTypes.STRING
   },
-  'first_name': {
+  firstName: {
     type: DataTypes.STRING(100), // eslint-disable-line
-    allowNull: false
+    allowNull: false,
+    field: `first_name`
   },
-  'last_name': {
+  lastName: {
     type: DataTypes.STRING(100), // eslint-disable-line
-    allowNull: false
+    allowNull: false,
+    field: `last_name`
   },
-  'email': {
+  password: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    timestamps: true,
+    paranoid: true,
+    createdAt: `created_at`,
+    updatedAt: `updated_at`,
+    deletedAt: `deleted_at`
   },
 },
 {

@@ -4,10 +4,10 @@
  * Подключаем все модули, и настраиваем связи
  */
 
-// !!! User временно отключен, пока не пройду следующий модуль
+
 const defineOfferType = require(`./offer-type`);
 const defineCategory = require(`./category`);
-// const defineUser = require(`./user`);
+const defineUser = require(`./user`);
 const defineOffer = require(`./offer`);
 const defineComment = require(`./comment`);
 const defineOfferCategory = require(`./offer-category`);
@@ -19,7 +19,7 @@ const define = (sequelize) => {
    */
   const OfferType = defineOfferType(sequelize);
   const Category = defineCategory(sequelize);
-  // const User = defineUser(sequelize);
+  const User = defineUser(sequelize);
   const Offer = defineOffer(sequelize);
   const Comment = defineComment(sequelize);
   const OfferCategory = defineOfferCategory(sequelize);
@@ -59,8 +59,8 @@ const define = (sequelize) => {
    * Связь пользователь - объявление
    * один ко многим, у пользователя может быть много объявлений, а у объявления только один владелец.
    */
-  // User.hasMany(Offer, {as: Alias.OFFERS, foreignKey: `user_id`});
-  // Offer.belongsTo(User, {as: Alias.USERS, foreignKey: `user_id`});
+  User.hasMany(Offer, {as: Alias.OFFERS, foreignKey: `user_id`});
+  Offer.belongsTo(User, {as: Alias.USERS, foreignKey: `user_id`});
 
   /**
    * Связь объявление - комментарий
@@ -73,13 +73,13 @@ const define = (sequelize) => {
    * Связь пользователь - комментарий
    * один ко многим, у пользователя много комментариев, а комментария один автор.
    */
-  // User.hasMany(Comment, {as: Alias.COMMENTS, foreignKey: `user_id`});
-  // Comment.belongsTo(User, {as: Alias.USERS, foreignKey: `user_id`});
+  User.hasMany(Comment, {as: Alias.COMMENTS, foreignKey: `user_id`});
+  Comment.belongsTo(User, {as: Alias.USERS, foreignKey: `user_id`});
 
   return {
     OfferType,
     Category,
-    // User,
+    User,
     Offer,
     Comment,
     OfferCategory};
