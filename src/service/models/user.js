@@ -8,15 +8,10 @@ const define = (sequelize) => User.init({
   avatar: {
     type: DataTypes.STRING
   },
-  firstName: {
+  firstNameAndLastName: {
     type: DataTypes.STRING(100), // eslint-disable-line
     allowNull: false,
-    field: `first_name`
-  },
-  lastName: {
-    type: DataTypes.STRING(100), // eslint-disable-line
-    allowNull: false,
-    field: `last_name`
+    field: `first_name_and_last_name`
   },
   password: {
     type: DataTypes.STRING,

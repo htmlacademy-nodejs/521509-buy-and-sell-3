@@ -214,8 +214,7 @@ const generateUsers = (count, firstNames, lastNames, emails) => {
   return Array(count).fill({}).map((it, index) => {
     return {
       _id: index + 1,
-      firstName: getRandomItemInArray(firstNames),
-      lastName: getRandomItemInArray(lastNames),
+      firstNameAndLastName: `${getRandomItemInArray(firstNames)} ${getRandomItemInArray(lastNames)}`,
       email: randomEmails[index],
       avatar: `avatar${(`0` + getRandomNumber(1, 4)).slice(-2)}.jpg`,
       password: bcrypt.hashSync(DEFAULT_USERS_PASSWORD, DEFAULT_USERS_PASSWORD_SALT)
