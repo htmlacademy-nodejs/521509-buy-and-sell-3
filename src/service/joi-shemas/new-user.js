@@ -14,7 +14,9 @@ module.exports = Joi.object({
     .min(6)
     .pattern(new RegExp(`^[a-zA-Z0-9]{3,30}$`)),
   repeatPassword: Joi.ref(`password`),
-  avatar: Joi.string()
-    .regex(new RegExp(/\.(jpe?g|png)$/i))
+  avatar: [
+    Joi.string().optional()
+    .regex(new RegExp(/\.(jpe?g|png)$/i)),
+    Joi.allow(null)]
 })
   .with(`password`, `repeatPassword`);
