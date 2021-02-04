@@ -26,17 +26,17 @@ const define = (sequelize) => User.init({
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
-    timestamps: true,
-    paranoid: true,
-    createdAt: `created_at`,
-    updatedAt: `updated_at`,
-    deletedAt: `deleted_at`
   },
 },
 {
   sequelize,
   modelName: `User`,
-  tableName: `users`
+  tableName: `users`,
+  timestamps: true,
+  paranoid: true,
+  createdAt: `created_at`,
+  updatedAt: `updated_at`,
+  deletedAt: `deleted_at`
 }
 );
 
