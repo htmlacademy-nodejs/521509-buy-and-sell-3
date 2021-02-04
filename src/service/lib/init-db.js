@@ -4,11 +4,11 @@ const defineModels = require(`../models`);
 const {getLogger} = require(`../lib/logger`);
 
 
-module.exports = async (sequelize, {offerTypes, categories, offers, comments, offersCategories}) => {
+module.exports = async (sequelize, {offerTypes, categories, offers, comments, offersCategories, users}) => {
   const logger = getLogger({name: `init-db`});
 
   logger.info(`Creating tables...`);
-  const {OfferType, Category, /* User, */Offer, Comment, OfferCategory} = defineModels(sequelize);
+  const {OfferType, Category, User, Offer, Comment, OfferCategory} = defineModels(sequelize);
   await sequelize.sync({force: true});
   logger.info(`New tables have been created.`);
 
@@ -20,10 +20,9 @@ module.exports = async (sequelize, {offerTypes, categories, offers, comments, of
   await Category.bulkCreate(categories);
   logger.info(`Categories have been inserted.`);
 
-  // Временно отключаем
-  // logger.info(`Добавляем ${users.length} пользователей.`);
-  // await User.bulkCreate(users);
-  // logger.info(`Пользователи добавлены.`);
+  logger.info(`Inserting ${users.length} users.`);
+  await User.bulkCreate(users);
+  logger.info(`Users have been inserted.`);
 
   logger.info(`Inserting ${offers.length} offers.`);
   await Offer.bulkCreate(offers);
