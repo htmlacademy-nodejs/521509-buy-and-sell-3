@@ -11,6 +11,8 @@
 
 const path = require(`path`);
 
+const bcrypt = require(`bcrypt`);
+
 const {getLogger} = require(`../lib/logger`);
 const initDB = require(`../lib/init-db`);
 
@@ -41,6 +43,22 @@ const DEFAULT_OFFERS_COUNT = 10;
  * @default 5
  */
 const DEFAULT_USERS_COUNT = 5;
+
+/**
+ * Пароль пользователей по умолчанию
+ * @const
+ * @type {String}
+ * @default 123456
+ */
+const DEFAULT_USERS_PASSWORD = `123456`;
+
+/**
+ * Соль для паролей пользователей по умолчанию
+ * @const
+ * @type {Number}
+ * @default 10
+ */
+const DEFAULT_USERS_PASSWORD_SALT = 10;
 
 
 /**
@@ -195,11 +213,11 @@ const generateUsers = (count, firstNames, lastNames, emails) => {
   const randomEmails = getRandomItemsInArray(emails, count);
   return Array(count).fill({}).map((it, index) => {
     return {
-      '_id': index + 1,
-      'first_name': getRandomItemInArray(firstNames),
-      'last_name': getRandomItemInArray(lastNames),
-      'email': randomEmails[index],
-      'avatar_url': `avatar${(`0` + getRandomNumber(1, 4)).slice(-2)}.jpg`
+      _id: index + 1,
+      firstNameAndLastName: `${getRandomItemInArray(firstNames)} ${getRandomItemInArray(lastNames)}`,
+      email: randomEmails[index],
+      avatar: `avatar${(`0` + getRandomNumber(1, 4)).slice(-2)}.jpg`,
+      password: bcrypt.hashSync(DEFAULT_USERS_PASSWORD, DEFAULT_USERS_PASSWORD_SALT)
     };
   });
 };
@@ -221,7 +239,7 @@ const generateComments = (offers, users, commentsSentences) => {
         'text': getRandomItemsInArray(commentsSentences).join(``),
         'created_at': getRandomDateInPast(MAX_PAST),
         'offer_id': offer._id,
-        // 'user_id': getRandomItemInArray(users).id
+        'user_id': getRandomItemInArray(users)._id
       };
     }));
   });
@@ -238,12 +256,12 @@ const generateComments = (offers, users, commentsSentences) => {
  * @param {Object[]} users - пользователи
  * @return {{cost: number, user_id: *, type_id: number, image_url: string, description: string, id, creation_date: Date, title: *}[]}
  */
-const generateOffers = (count, saleTitles, sentences /* ,users*/) => {
+const generateOffers = (count, saleTitles, sentences, users) => {
   return Array(count).fill({}).map((it, index) => {
     return {
       '_id': index + 1,
       'type_id': getRandomNumber(1, 2),
-      // 'user_id': getRandomItemInArray(users).id,
+      'user_id': getRandomItemInArray(users)._id,
       'title': getRandomItemInArray(saleTitles),
       'description': getRandomItemsInArray(sentences).join(` `),
       'created_at': getRandomDateInPast(MAX_PAST),
@@ -281,8 +299,7 @@ const generateOffersCategories = (offers, categories) => {
 const readDataForGeneration = async (filePath) => {
   try {
     const absolutePath = path.join(__dirname, PATH_TO_ROOT_FOLDER, filePath);
-    const contentArray = await readFileToArray(absolutePath);
-    return contentArray;
+    return await readFileToArray(absolutePath);
   } catch (error) {
     throw new Error(`Не удалось прочитать файл ${filePath}: ${error.message}`);
   }
@@ -341,7 +358,7 @@ module.exports = {
       const comments = generateComments(offers, users, commentsSentences);
       const offersCategories = generateOffersCategories(offers, categories);
 
-      await initDB(sequelize, {offerTypes, categories, offers, comments, offersCategories});
+      await initDB(sequelize, {offerTypes, categories, offers, comments, offersCategories, users});
 
       logger.info(`Generated ${countNumber} offers and inserted in DB`);
       process.exit(ExitCodes.SUCCESS);
