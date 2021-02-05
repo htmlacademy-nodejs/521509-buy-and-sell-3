@@ -50,7 +50,7 @@ class API {
   }
 
   createUser(data) {
-    return this._request(`/user/add`, {
+    return this._request(`/user`, {
       method: Methods.POST,
       data
     });

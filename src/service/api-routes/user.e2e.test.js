@@ -55,7 +55,7 @@ describe(`Creating valid user is ok`, () => {
   beforeAll(async () => {
     ({app, sequelize} = await createAPI());
     response = await request(app)
-      .post(`/user/add`)
+      .post(`/user`)
       .send(NEW_USER);
   });
 
@@ -82,7 +82,7 @@ describe(`API returns 400 if posting user is invalid`, () => {
       const badUser = {...NEW_USER};
       delete badUser[key];
       await request(app)
-        .post(`/user/add`)
+        .post(`/user`)
         .send(badUser)
         .expect((res) => expect(res.statusCode).toBe(HttpCode.BAD_REQUEST));
     }
@@ -90,7 +90,7 @@ describe(`API returns 400 if posting user is invalid`, () => {
 
   test(`There are 5 errors in invalid user`, async () => {
     await request(app)
-      .post(`/user/add`)
+      .post(`/user`)
       .send(NEW_INVALID_USER)
       .expect((res) => {
         expect(res.statusCode).toBe(HttpCode.BAD_REQUEST);
@@ -111,7 +111,7 @@ describe(`Creating user with exists email should fail`, () => {
   beforeAll(async () => {
     ({app, sequelize} = await createAPI());
     response = await request(app)
-      .post(`/user/add`)
+      .post(`/user`)
       .send(NEW_USER_WITH_NOT_UNIQUE_EMAIL);
   });
 

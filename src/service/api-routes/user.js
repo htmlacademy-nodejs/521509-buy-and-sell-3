@@ -11,7 +11,7 @@ const newUserSchema = require(`../joi-shemas/new-user`);
 module.exports = (userService) => {
   const router = new Router();
 
-  router.post(`/add`, [joiValidator(newUserSchema), checkUniqueEmail(userService)], async (req, res) => {
+  router.post(`/`, [joiValidator(newUserSchema), checkUniqueEmail(userService)], async (req, res) => {
     let newUser = req.body;
     newUser = await userService.add(newUser);
 
