@@ -27,6 +27,7 @@ module.exports = async (app, sequelize) => {
     resave: false,
     proxy: true,
     saveUninitialized: false,
+    sameSite: `none`
   }));
 
   await sequelize.sync({force: false});

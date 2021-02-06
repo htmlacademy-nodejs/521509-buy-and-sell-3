@@ -22,8 +22,12 @@ class API {
     return response.data;
   }
 
-  getOffers({page, isWithComments, categoryId} = {}) {
-    return this._request(`/offers`, {params: {page, categoryId, isWithComments}});
+  getOffers({page, isWithComments, categoryId, isOnlyUser} = {}) {
+    let addRoute = ``;
+    if (isOnlyUser) {
+      addRoute = `/my`;
+    }
+    return this._request(`/offers${addRoute}`, {params: {page, categoryId, isWithComments}, withCredentials: true});
   }
 
   getOffer(id) {
@@ -51,6 +55,13 @@ class API {
 
   createUser(data) {
     return this._request(`/user`, {
+      method: Methods.POST,
+      data
+    });
+  }
+
+  authUser(data) {
+    return this._request(`/auth`, {
       method: Methods.POST,
       data
     });
