@@ -12,9 +12,12 @@ module.exports = (userService) => {
   const router = new Router();
 
   router.post(`/`, [joiValidator(authSchema), checkUserAndPassword(userService)], async (req, res) => {
-    // session creation
-
     res.status(HttpCode.OK).json({massage: `success`});
+  });
+
+  router.delete(`/`, async (req, res) => {
+    req.session.destroy();
+    res.status(HttpCode.DELETED).json({massage: `success`});
   });
 
   return router;
