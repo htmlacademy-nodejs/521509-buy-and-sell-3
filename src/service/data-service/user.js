@@ -89,7 +89,7 @@ class UserService {
       throw new Error(`User with such email and password doesn't found.`);
     }
 
-    return true;
+    return user;
   }
 }
 
