@@ -18,7 +18,6 @@ module.exports = async (app, sequelize) => {
   const mySessionStore = new SequelizeStore({
     db: sequelize,
     expiration: +process.env.SESSION_EXPIRATION,
-    // expiration: 90000,
     checkExpirationInterval: +process.env.SESSION_CHECK_EXPIRATTION_INTERVAL,
   });
 

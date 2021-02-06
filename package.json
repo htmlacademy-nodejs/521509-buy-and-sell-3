@@ -47,5 +47,8 @@
     "pino": "6.8.0",
     "pug": "3.0.0",
     "sequelize": "6.3.5"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
