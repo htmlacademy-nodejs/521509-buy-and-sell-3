@@ -74,12 +74,22 @@ class UserService {
   async checkUser(id, password, email = null) {
     let user;
     if (email) {
-      user = this.getOneByEmail(email);
+      user = await this.getOneByEmail(email);
     } else {
-      user = this.getOne(id);
+      user = await this.getOne(id);
     }
 
-    return await bcrypt.compare(password, user.password);
+    if (!user) {
+      throw new Error(`User doesn't exist`);
+    }
+
+    const isCorrectUser = await bcrypt.compare(password, user.password);
+
+    if (!isCorrectUser) {
+      throw new Error(`User with such email and password doesn't found.`);
+    }
+
+    return true;
   }
 }
 
