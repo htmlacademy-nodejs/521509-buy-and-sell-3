@@ -20,6 +20,7 @@ const offerRouter = require(`./offer`);
 const searchRouter = require(`./search`);
 const offerTypeRouter = require(`./offer_type`);
 const userRouter = require(`./user`);
+const authRouter = require(`./auth`);
 
 const {getSequelize} = require(`../lib/sequelize`);
 const defineModels = require(`../models`);
@@ -36,6 +37,7 @@ const getAPIRouter = async () => {
   app.use(`/search`, searchRouter(new SearchService(sequelize)));
   app.use(`/offer-types`, offerTypeRouter(new OfferTypeService(sequelize)));
   app.use(`/user`, userRouter(new UserService(sequelize)));
+  app.use(`/auth`, authRouter(new UserService(sequelize)));
   return app;
 };
 
