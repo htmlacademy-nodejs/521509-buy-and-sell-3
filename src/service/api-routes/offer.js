@@ -6,6 +6,7 @@ const checkNumberId = require(`../middlewares/checkNumberId`);
 const offerExists = require(`../middlewares/offer-exists`);
 const commentExists = require(`../middlewares/comment-exists`);
 const joiValidator = require(`../middlewares/joi-validator`);
+const checkUserAuth = require(`../middlewares/is-user-authenticated`);
 
 const commentSchema = require(`../joi-shemas/comment`);
 const offerSchema = require(`../joi-shemas/offer`);
@@ -33,6 +34,21 @@ module.exports = (offerService, commentService) => {
     }
 
     offers = {...offers, ...getNextAndPrevUrl(req, offers.count, +page, {isWithComments, categoryId})};
+
+    res.status(HttpCode.OK).json(offers);
+  });
+
+  router.get(`/my/`, checkUserAuth(), async (req, res) => {
+    let {page, isWithComments} = req.query;
+    const userId = req.session.userId;
+
+    if (Number.isNaN(+page) || page <= 0) {
+      page = 1;
+    }
+
+    let offers = await offerService.getPage(+page, isWithComments, userId);
+
+    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, +page, {isWithComments})};
 
     res.status(HttpCode.OK).json(offers);
   });
