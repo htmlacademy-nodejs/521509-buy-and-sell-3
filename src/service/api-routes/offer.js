@@ -61,8 +61,9 @@ module.exports = (offerService, commentService) => {
   });
 
 
-  router.post(`/`, joiValidator(offerSchema), async (req, res) => {
+  router.post(`/`, [joiValidator(offerSchema), checkUserAuth()], async (req, res) => {
     let newOffer = req.body;
+    newOffer[`user_id`] = res.locals.user.id;
     newOffer = await offerService.add(newOffer);
 
     res.status(HttpCode.CREATED).json(newOffer);
