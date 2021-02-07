@@ -8,11 +8,15 @@
 const path = require(`path`);
 
 const express = require(`express`);
+const cors = require(`cors`);
 const chalk = require(`chalk`);
 
 const mainRoutes = require(`./routes/main-routes`);
 const myRoutes = require(`./routes/my-routes`);
 const offersRoutes = require(`./routes/offers-routes`);
+
+const checkUserAuth = require(`./middlewares/checkUserAuth`);
+
 
 /**
  * Номер порта для запуска по умолчанию
@@ -61,6 +65,13 @@ const app = express();
  */
 app.set(`views`, path.resolve(__dirname, PATH_TO_TEMPLATES_DIR));
 app.set(`view engine`, `pug`);
+
+app.use(cors({
+  origin: `http://localhost:8080`,
+  credentials: true
+}));
+
+app.use(checkUserAuth());
 
 /**
  * Подключаем Router'ы для путей.

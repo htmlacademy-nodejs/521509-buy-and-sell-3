@@ -10,17 +10,25 @@ const {Router} = require(`express`);
 const API = require(`../api`);
 const upload = require(`../lib/multer`);
 
+const alreadyLogged = require(`../middlewares/already-logged`);
+
+
 const mainRoutes = new Router();
 const api = API.getDefaultAPI();
 
 
 mainRoutes.get(`/`, async (req, res) => {
-  const [{offers}, categories] = await Promise.all([api.getOffers(), api.getCategories({isWithCount: true})]);
-  res.render(`pages/main`, {allOffers: offers, categories});
+  const [offerResponse, categoriesResponse] = await Promise.all([
+    api.getOffers({...res.locals.apiCookies}),
+    api.getCategories({isWithCount: true, ...res.locals.apiCookies})
+  ]);
+  const {offers} = offerResponse.data;
+  const categories = categoriesResponse.data;
+  res.render(`pages/main`, {allOffers: offers, categories, user: res.locals.user});
 });
 
 
-mainRoutes.get(`/register`, (req, res) => res.render(`pages/register`, {userData: {}}));
+mainRoutes.get(`/register`, alreadyLogged(), (req, res) => res.render(`pages/register`, {userData: {}, user: {}}));
 
 
 mainRoutes.post(`/register`, upload.single(`avatar`), async (req, res) => {
@@ -43,13 +51,16 @@ mainRoutes.post(`/register`, upload.single(`avatar`), async (req, res) => {
   } catch (e) {
     res.render(`pages/register`, {
       userData,
-      error: e.response.data.error
+      error: e.response.data.error,
+      user: {}
     });
   }
 });
 
 
-mainRoutes.get(`/login`, (req, res) => res.render(`pages/login`, {userData: {}}));
+mainRoutes.get(`/login`, alreadyLogged(), (req, res) => {
+  res.render(`pages/login`, {userData: {}, user: {}});
+});
 
 mainRoutes.post(`/login`, upload.none(), async (req, res) => {
   const userData = {
@@ -57,12 +68,14 @@ mainRoutes.post(`/login`, upload.none(), async (req, res) => {
     password: req.body[`user-password`]
   };
   try {
-    await api.authUser(userData);
+    const {cookies} = await api.authUser(userData);
+    res.set(`Set-Cookie`, cookies);
     res.redirect(`/my`);
   } catch (e) {
     res.render(`pages/login`, {
       userData,
-      error: e.response.data.error
+      error: e.response.data.error,
+      user: {}
     });
   }
 });
@@ -70,13 +83,13 @@ mainRoutes.post(`/login`, upload.none(), async (req, res) => {
 
 mainRoutes.get(`/search`, async (req, res) => {
   const searchText = req.query.query;
-  let result;
+  let data;
   try {
-    result = await api.search(searchText);
+    ({data} = await api.search(searchText));
   } catch (err) {
-    result = [];
+    data = [];
   }
-  res.render(`pages/search`, {result});
+  res.render(`pages/search`, {result: data, user: res.locals.user});
 });
 
 module.exports = mainRoutes;

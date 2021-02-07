@@ -12,7 +12,7 @@ block content
                 h2.announce-card__title #{oneOffer.title}
                 span.announce-card__info
                   span.announce-card__price ₽ #{oneOffer.sum}
-                  +getTicketLabel(oneOffer.type)(class=`span.announce-card__type`)
+                  +getTicketLabel(oneOffer.offerType)(class=`span.announce-card__type`)
             ul.comments-list
               each comment in oneOffer.comments
                 li.js-card

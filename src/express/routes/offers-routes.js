@@ -18,7 +18,7 @@ const api = API.getDefaultAPI();
 offersRoutes.get(`/add`, async (req, res) => {
   const categories = await api.getCategories();
   const offerTypes = await api.getOfferTypes();
-  res.render(`pages/offers/new-ticket`, {categories, allOfferTypes: offerTypes, oneOfferData: {}});
+  res.render(`pages/offers/new-ticket`, {categories: categories.data, allOfferTypes: offerTypes.data, oneOfferData: {}});
 });
 
 offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
@@ -40,18 +40,18 @@ offersRoutes.post(`/add`, upload.single(`avatar`), async (req, res) => {
     res.render(`pages/offers/new-ticket`, {
       oneOfferData: offerData,
       error: e.response.data.error,
-      categories,
-      allOfferTypes: offerTypes});
+      categories: categories.data,
+      allOfferTypes: offerTypes.data});
   }
 });
 
 offersRoutes.get(`/:id`, async (req, res) => {
-  const oneOffer = await api.getOffer(req.params.id);
-  res.render(`pages/offers/ticket`, {oneOffer});
+  const {data} = await api.getOffer(req.params.id);
+  res.render(`pages/offers/ticket`, {oneOffer: data});
 });
 offersRoutes.get(`/edit/:id`, async (req, res) => {
   const [oneOffer, categories, offerTypes] = await Promise.all([api.getOffer(req.params.id), api.getCategories(), api.getOfferTypes()]);
-  res.render(`pages/offers/ticket-edit`, {oneOffer, categories, allOfferTypes: offerTypes});
+  res.render(`pages/offers/ticket-edit`, {oneOffer: oneOffer.data, categories: categories.data, allOfferTypes: offerTypes.data});
 });
 
 offersRoutes.get(`/category/:id`, async (req, res) => {
@@ -62,12 +62,14 @@ offersRoutes.get(`/category/:id`, async (req, res) => {
 
 
   const [
-    {count, offers, totalPages},
-    categories
+    offerResponse,
+    categoriesResponse
   ] = await Promise.all([
-    api.getOffers({page, categoryId}),
+    api.getOffers({page, categoryId, ...res.locals.apiCookies}),
     api.getCategories({isWithCount: true})
   ]);
+  const {count, offers, totalPages} = offerResponse.data;
+  const categories = categoriesResponse.data;
   const currentCategory = categories.find((it) => it.id === +categoryId);
 
   res.render(`pages/offers/category`, {allOffers: offers, count, categories, currentCategory, page, totalPages, prefix: `${categoryId}?`});
