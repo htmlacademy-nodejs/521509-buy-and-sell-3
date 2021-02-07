@@ -7,6 +7,7 @@
  */
 
 const express = require(`express`);
+const cors = require(`cors`);
 
 const {getAPIRouter} = require(`../api-routes`);
 const {getLogger} = require(`../lib/logger`);
@@ -54,6 +55,11 @@ module.exports = {
 
     const app = express();
     app.use(express.json());
+
+    app.use(cors({
+      origin: `http://localhost:8080`,
+      credentials: true
+    }));
 
     await initSessions(app, sequelize);
 
