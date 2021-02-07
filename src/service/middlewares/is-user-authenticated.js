@@ -12,6 +12,7 @@ module.exports = () => async (req, res, next) => {
 
   logger.debug(`Check user auth...`);
 
+  res.locals.user = req.session.user;
 
   if (!req.session.isLogged) {
     logger.debug(`User is not authenticated`);

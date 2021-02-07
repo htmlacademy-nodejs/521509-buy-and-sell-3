@@ -17,7 +17,7 @@ module.exports = (userService) => async (req, res, next) => {
 
     req.session.isLogged = true;
     req.session.userId = user.id;
-    req.session.userName = user.firstNameAndLastName;
+    req.session.user = user;
     logger.debug(`User ${user.id} is authenticated.`);
     next();
   } catch (err) {

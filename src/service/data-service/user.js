@@ -89,6 +89,8 @@ class UserService {
       throw new Error(`User with such email and password doesn't found.`);
     }
 
+    delete user.password;
+
     return user;
   }
 }
