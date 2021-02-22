@@ -40,7 +40,7 @@ module.exports = (offerService, commentService) => {
 
   router.get(`/my/`, checkUserAuth(), async (req, res) => {
     let {page, isWithComments} = req.query;
-    const userId = req.session.userId;
+    const userId = res.locals.userData.id;
 
     if (Number.isNaN(+page) || page <= 0) {
       page = 1;

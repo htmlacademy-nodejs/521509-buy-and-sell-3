@@ -10,6 +10,7 @@ const path = require(`path`);
 const express = require(`express`);
 const cors = require(`cors`);
 const chalk = require(`chalk`);
+const cookieParser = require(`cookie-parser`);
 
 const mainRoutes = require(`./routes/main-routes`);
 const myRoutes = require(`./routes/my-routes`);
@@ -65,11 +66,18 @@ const app = express();
  */
 app.set(`views`, path.resolve(__dirname, PATH_TO_TEMPLATES_DIR));
 app.set(`view engine`, `pug`);
+app.use(cookieParser());
 
 app.use(cors({
   origin: `http://localhost:8080`,
   credentials: true
 }));
+
+/**
+ * Добавляем отдачу статичных файлов.
+ */
+app.use(express.static(path.resolve(__dirname, PATH_TO_PUBLIC_DIR)));
+app.use(express.static(path.resolve(__dirname, PATH_TO_UPLOAD_DIR)));
 
 app.use(checkUserAuth());
 
@@ -80,11 +88,6 @@ app.use(`/`, mainRoutes);
 app.use(`/my`, myRoutes);
 app.use(`/offers`, offersRoutes);
 
-/**
- * Добавляем отдачу статичных файлов.
- */
-app.use(express.static(path.resolve(__dirname, PATH_TO_PUBLIC_DIR)));
-app.use(express.static(path.resolve(__dirname, PATH_TO_UPLOAD_DIR)));
 
 /**
  * Добавляем обработчики ошибок.

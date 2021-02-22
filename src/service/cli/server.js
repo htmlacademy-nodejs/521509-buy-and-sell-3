@@ -18,7 +18,6 @@ const notFoundMiddleWare = require(`../middlewares/resource-not-found`);
 const internalErrorMiddleWare = require(`../middlewares/intenal-server-error`);
 
 const {getSequelize} = require(`../lib/sequelize`);
-const initSessions = require(`../lib/init-sessions`);
 /**
  * Порт по умолчанию
  * @const
@@ -60,8 +59,6 @@ module.exports = {
       origin: `http://localhost:8080`,
       credentials: true
     }));
-
-    await initSessions(app, sequelize);
 
     app.use(requestLogger);
     app.use(API_PREFIX, await getAPIRouter());

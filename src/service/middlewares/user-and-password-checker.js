@@ -5,6 +5,8 @@
  */
 
 const {getLogger} = require(`../lib/logger`);
+const JWTHelper = require(`../lib/jwt`);
+
 const {HttpCode} = require(`../../consts`);
 
 module.exports = (userService) => async (req, res, next) => {
@@ -15,9 +17,8 @@ module.exports = (userService) => async (req, res, next) => {
   try {
     const user = await userService.checkUser(null, req.body.password, req.body.email);
 
-    req.session.isLogged = true;
-    req.session.userId = user.id;
-    req.session.user = user;
+    res.locals.tokens = JWTHelper.generateTokens(user);
+
     logger.debug(`User ${user.id} is authenticated.`);
     next();
   } catch (err) {

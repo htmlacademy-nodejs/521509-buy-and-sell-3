@@ -3,9 +3,10 @@
 const {Router} = require(`express`);
 const {HttpCode} = require(`../../consts`);
 
+const JWTHelper = require(`../lib/jwt`);
+
 const joiValidator = require(`../middlewares/joi-validator`);
 const checkUserAndPassword = require(`../middlewares/user-and-password-checker`);
-const checkUserAuth = require(`../middlewares/is-user-authenticated`);
 
 const authSchema = require(`../joi-shemas/auth`);
 
@@ -13,16 +14,17 @@ module.exports = (userService) => {
   const router = new Router();
 
   router.post(`/`, [joiValidator(authSchema), checkUserAndPassword(userService)], async (req, res) => {
-    res.status(HttpCode.OK).json({massage: `success`, sid: req.sessionID});
+    res.status(HttpCode.OK).json({message: `success`, ...res.locals.tokens});
   });
 
-  router.get(`/`, checkUserAuth(), async (req, res) => {
-    res.status(HttpCode.OK).json({massage: `authenticated`, sid: req.sessionID, user: res.locals.user});
-  });
-
-  router.delete(`/`, async (req, res) => {
-    req.session.destroy();
-    res.status(HttpCode.DELETED).json({massage: `success`});
+  router.post(`/refresh`, async (req, res) => {
+    const {refreshToken} = req.body;
+    try {
+      const newTokens = await JWTHelper.refreshAccessToken(refreshToken);
+      res.status(HttpCode.OK).json({message: `success`, ...newTokens});
+    } catch (e) {
+      res.status(HttpCode.FORBIDDEN).json({error: {code: HttpCode.FORBIDDEN, message: `Failed token refreshing`, details: e.message}});
+    }
   });
 
   return router;

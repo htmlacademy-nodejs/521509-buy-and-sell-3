@@ -18,12 +18,10 @@ const api = API.getDefaultAPI();
 
 
 mainRoutes.get(`/`, async (req, res) => {
-  const [offerResponse, categoriesResponse] = await Promise.all([
+  const [{offers}, categories] = await Promise.all([
     api.getOffers({...res.locals.apiCookies}),
     api.getCategories({isWithCount: true, ...res.locals.apiCookies})
   ]);
-  const {offers} = offerResponse.data;
-  const categories = categoriesResponse.data;
   res.render(`pages/main`, {allOffers: offers, categories, user: res.locals.user});
 });
 
@@ -68,8 +66,8 @@ mainRoutes.post(`/login`, upload.none(), async (req, res) => {
     password: req.body[`user-password`]
   };
   try {
-    const {cookies} = await api.authUser(userData);
-    res.set(`Set-Cookie`, cookies);
+    const {accessToken, refreshToken} = await api.authUser(userData);
+    res.cookie(`tokens`, JSON.stringify({accessToken, refreshToken}), {httpOnly: true});
     res.redirect(`/my`);
   } catch (e) {
     res.render(`pages/login`, {
@@ -85,7 +83,7 @@ mainRoutes.get(`/search`, async (req, res) => {
   const searchText = req.query.query;
   let data;
   try {
-    ({data} = await api.search(searchText));
+    (data = await api.search(searchText));
   } catch (err) {
     data = [];
   }

@@ -13,23 +13,22 @@ class API {
   constructor(baseURL, timeout) {
     this._http = axios.create({
       baseURL,
-      timeout,
-      withCredentials: true
+      timeout
     });
   }
 
-  async _request(url, options) {
-    const response = await this._http.request({url, ...options, withCredentials: true});
-    const cookies = response.headers[`set-cookie`] || response.headers[`cookie`];
-    return {data: response.data, cookies};
+  async _request(url, options, token) {
+    const headers = token ? {authorization: token} : {};
+    const response = await this._http.request({url, ...options, headers});
+    return response.data;
   }
 
-  getOffers({page, isWithComments, categoryId, isOnlyUser, cookies} = {}) {
+  getOffers({page, isWithComments, categoryId, isOnlyUser, accessToken} = {}) {
     let addRoute = ``;
     if (isOnlyUser) {
       addRoute = `/my`;
     }
-    return this._request(`/offers${addRoute}`, {params: {page, categoryId, isWithComments}, headers: {Cookie: cookies}});
+    return this._request(`/offers${addRoute}`, {params: {page, categoryId, isWithComments}}, accessToken);
   }
 
   getOffer(id) {
@@ -69,8 +68,11 @@ class API {
     });
   }
 
-  checkUserAuth({cookies = ``}) {
-    return this._request(`/auth`, {headers: {Cookie: cookies}});
+  refreshTokens(refreshToken) {
+    return this._request(`/auth/refresh`, {
+      method: Methods.POST,
+      data: {refreshToken}
+    });
   }
 
   static getDefaultAPI() {
