@@ -6,6 +6,7 @@ const checkNumberId = require(`../middlewares/checkNumberId`);
 const offerExists = require(`../middlewares/offer-exists`);
 const commentExists = require(`../middlewares/comment-exists`);
 const joiValidator = require(`../middlewares/joi-validator`);
+const checkUserAuth = require(`../middlewares/is-user-authenticated`);
 
 const commentSchema = require(`../joi-shemas/comment`);
 const offerSchema = require(`../joi-shemas/offer`);
@@ -37,6 +38,21 @@ module.exports = (offerService, commentService) => {
     res.status(HttpCode.OK).json(offers);
   });
 
+  router.get(`/my/`, checkUserAuth(), async (req, res) => {
+    let {page, isWithComments} = req.query;
+    const userId = res.locals.userData.id;
+
+    if (Number.isNaN(+page) || page <= 0) {
+      page = 1;
+    }
+
+    let offers = await offerService.getPage(+page, isWithComments, userId);
+
+    offers = {...offers, ...getNextAndPrevUrl(req, offers.count, +page, {isWithComments})};
+
+    res.status(HttpCode.OK).json(offers);
+  });
+
 
   router.get(`/:offerId`, [checkNumberId(`offerId`), offerExists(offerService)], (req, res) => {
     const {offer} = res.locals;
@@ -45,8 +61,9 @@ module.exports = (offerService, commentService) => {
   });
 
 
-  router.post(`/`, joiValidator(offerSchema), async (req, res) => {
+  router.post(`/`, [joiValidator(offerSchema), checkUserAuth()], async (req, res) => {
     let newOffer = req.body;
+    newOffer[`user_id`] = res.locals.user.id;
     newOffer = await offerService.add(newOffer);
 
     res.status(HttpCode.CREATED).json(newOffer);

@@ -8,18 +8,20 @@
 
 const {Router} = require(`express`);
 
+const privatPages = require(`../middlewares/privatPages`);
+
 const API = require(`../api`);
 
 const myRoutes = new Router();
 const api = API.getDefaultAPI();
 
-myRoutes.get(`/`, async (req, res) => {
-  const {offers} = await api.getOffers();
-  res.render(`pages/my/my-tickets`, {allOffers: offers});
+myRoutes.get(`/`, [privatPages()], async (req, res) => {
+  const {offers} = await api.getOffers({isOnlyUser: true, accessToken: res.locals.accessToken});
+  res.render(`pages/my/my-tickets`, {allOffers: offers, user: res.locals.user});
 });
-myRoutes.get(`/comments`, async (req, res) => {
-  const allOffers = await api.getOffers({isWithComments: true});
-  res.render(`pages/my/comments`, {allOffers: allOffers.slice(0, 3)});
+myRoutes.get(`/comments`, [privatPages()], async (req, res) => {
+  const {offers} = await api.getOffers({isWithComments: true, accessToken: res.locals.accessToken});
+  res.render(`pages/my/comments`, {allOffers: offers.slice(0, 3), user: res.locals.user});
 });
 
 module.exports = myRoutes;

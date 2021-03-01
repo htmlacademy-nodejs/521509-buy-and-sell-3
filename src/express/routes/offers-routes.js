@@ -65,7 +65,7 @@ offersRoutes.get(`/category/:id`, async (req, res) => {
     {count, offers, totalPages},
     categories
   ] = await Promise.all([
-    api.getOffers({page, categoryId}),
+    api.getOffers({page, categoryId, ...res.locals.apiCookies}),
     api.getCategories({isWithCount: true})
   ]);
   const currentCategory = categories.find((it) => it.id === +categoryId);

@@ -67,18 +67,27 @@ class OfferService {
    * @async
    * @param {Number} page - номер страницы
    * @param {Boolean} isWithComments - нужны ли комментарии
+   * @param {Number} userId - Id пользователя
    * @return {Object[]}
    */
-  async getPage(page, isWithComments) {
+  async getPage(page, isWithComments, userId) {
     const include = [Aliase.CATEGORIES, Aliase.OFFER_TYPE];
+    let where = null;
     if (isWithComments) {
       include.push(Aliase.COMMENTS);
     }
+    if (userId) {
+      where = {
+        'user_id': userId
+      };
+    }
+
     const {count, rows} = await this._offerModel.findAndCountAll({
       limit: PAGE_SIZE,
       offset: (PAGE_SIZE * (page - 1)),
       distinct: true,
-      include
+      include,
+      where
     });
 
     return {count, offers: rows};
